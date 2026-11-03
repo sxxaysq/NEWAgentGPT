@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AgentGPT · 自主任务助手</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/session_settings.js?v=semantic-tools-1" defer></script>
+  <script src="/static/app.js?v=semantic-tools-1" defer></script>
+</head>
+<body>
+  <aside id="sidebar">
+    <a class="brand" href="/"><span class="brand-icon">A</span> AgentGPT <span class="tag">原型</span></a>
+    <button class="primary full" id="new-session">＋ 新建目标</button>
+    <div class="section-label">最近的目标</div>
+    <nav id="history"></nav>
+    <div class="sidebar-bottom"><button id="memory-button">◇ 长期记忆</button><button id="knowledge-button">▤ 私有资料</button><button id="logout">退出登录</button><span id="user-email"></span></div>
+  </aside>
+  <main>
+    <header><div><span class="connection-dot"></span><span id="connection-state" class="muted">连接中</span><span id="model-label">正在连接服务</span><span class="muted" id="mcp-label"></span></div><button id="settings-button">⚙ 运行设置</button></header>
+    <section id="welcome">
+      <div class="eyebrow">把目标交给 Agent，把进展留给你</div>
+      <h1>从一个目标，<br><span>开始行动。</span></h1>
+      <p>拆解任务、检索资料、生成结果。你可以随时暂停，或继续追问。</p>
+      <form id="goal-form"><label for="goal">你想完成什么？</label><textarea id="goal" rows="4" maxlength="8000" placeholder="例如：为 Python 初学者制定三步学习计划，每步包含练习和验收标准。" required></textarea><div class="form-bottom"><span>任务与会话自动保存</span><button class="primary" type="submit">开始执行 ↗</button></div></form>
+      <div class="examples"><button data-example="仅基于已有知识，为 Python 初学者制定三步学习计划，每步包含一个练习和验收标准，无需联网。">⌘ 规划学习路径</button><button data-example="搜索 LangGraph 官方文档，整理 StateGraph、ToolNode 和 Checkpointer 的用途，并附来源链接。">⌕ 调研技术方案</button><button data-example="检索我上传的私有资料，提取项目约束并整理成待办清单。">▤ 整理私有资料</button></div>
+    </section>
+    <section id="workspace" hidden>
+      <div class="workspace-heading"><div><div class="eyebrow">当前目标 · Plan → Execute → Replan</div><h2 id="session-title"></h2><p id="session-goal"></p></div><span id="run-status" class="status"></span></div>
+      <div class="toolbar"><button id="pause">Ⅱ 暂停</button><button id="resume">▷ 继续</button><button id="stop">□ 停止</button><span class="spacer"></span><button id="summarize">生成总结</button><button id="share">分享</button><button id="revoke-share" hidden>撤销分享</button><a id="export-md" class="button" href="#">导出 Markdown</a><a id="export-json" class="button" href="#">JSON</a></div>
+      <div class="workspace-grid"><div class="results-column"><div class="section-label">执行结果与对话</div><div id="messages"></div><div id="live-output" hidden><div class="live-label"><span class="connection-dot"></span><span id="live-node">正在生成</span></div><pre id="live-text"></pre></div><div id="run-error" role="alert" hidden></div><form id="chat-form"><textarea id="chat" rows="2" maxlength="8000" placeholder="基于当前结果继续追问…" required></textarea><div><select id="chat-mode" aria-label="操作类型"><option value="chat">追问</option><option value="append">追加任务</option></select><button class="primary" type="submit">发送 ↑</button></div></form></div><aside class="task-column"><div class="section-label">任务进度 <span id="task-count"></span></div><div id="tasks"></div><div class="section-label tool-log-title">工具活动</div><div id="tool-log" class="muted">等待工具调用</div></aside></div>
+    </section>
+  </main>
+  <dialog id="auth-dialog"><form id="auth-form"><div class="brand auth-brand"><span class="brand-icon">A</span> AgentGPT</div><h2 id="auth-title">欢迎回来</h2><p class="muted">登录后保存你的目标与执行记录。</p><label>邮箱<input id="email" type="email" autocomplete="username" required></label><label>密码<input id="password" type="password" autocomplete="current-password" minlength="8" required></label><p id="auth-error" class="error"></p><button class="primary full" type="submit" id="auth-submit">登录</button><button type="button" class="text-button full" id="auth-toggle">还没有账号？创建账号</button></form></dialog>
+  <dialog id="settings-dialog"><div class="dialog-heading"><h2>运行设置</h2><button data-close="settings-dialog" aria-label="关闭">×</button></div><p class="muted">设置用于新目标；暂停后也可修改当前目标的设置。</p><form id="settings-form"><label>回答语言<input id="language" value="简体中文" maxlength="40"></label><div class="setting-row"><label>Temperature<input id="temperature" type="number" min="0" max="1" step="0.1" value="0.3"></label><label>最大输出 Token<input id="max-tokens" type="number" min="128" max="8192" step="128" value="2000"></label></div><label>单任务工具轮数<input id="max-tool-rounds" type="number" min="1" max="8" value="3"></label><label>项目记忆范围<input id="memory-scope" maxlength="80" placeholder="例如：煤矿项目；留空只使用全局记忆"></label><h3>工具</h3><div id="tool-options"></div><button class="primary full" type="submit">保存设置</button></form></dialog>
+  <dialog id="knowledge-dialog"><div class="dialog-heading"><h2>私有资料</h2><button data-close="knowledge-dialog" aria-label="关闭">×</button></div><p class="muted">资料仅供当前账号检索。支持 TXT、Markdown、CSV、JSON 和文本 PDF，单个文件不超过 4MB。</p><form id="upload-form"><input id="document-file" type="file" accept=".txt,.md,.csv,.json,.pdf" required><button class="primary" type="submit">上传资料</button></form><div id="documents"></div></dialog>
+  <dialog id="memory-dialog"><div class="dialog-heading"><h2>长期记忆</h2><button data-close="memory-dialog" aria-label="关闭">×</button></div><label><input id="memory-enabled" type="checkbox">启用自动记忆与召回</label><p id="memory-status" class="muted"></p><button id="memory-retry">重试失败的记忆任务</button><form id="memory-form"><label>记忆内容<textarea id="memory-content" maxlength="500" required></textarea></label><label>项目范围（留空为全局偏好）<input id="memory-new-scope" maxlength="80"></label><button type="submit" class="primary">保存记忆</button></form><div id="memory-items"></div></dialog>
+  <div id="toast" role="status" hidden></div>
+</body>
+</html>
