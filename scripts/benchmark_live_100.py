@@ -185,6 +185,10 @@ class Case:
                 ).raise_for_status()
                 pause_sent = True
             if state.get("run_id") == run and state.get("status") in TERMINAL:
+                if pause and resumed and state["status"] == "paused":
+                    # The acknowledged continuation can precede its new UI projection.
+                    await asyncio.sleep(0.5)
+                    continue
                 if pause and state["status"] == "paused" and not resumed:
                     continued = await client.post(
                         f"/api/threads/{thread}/commands",

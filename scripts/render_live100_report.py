@@ -4,6 +4,7 @@
 import argparse
 import collections
 import json
+import re
 from pathlib import Path
 
 LABELS = {
@@ -27,7 +28,17 @@ def compact(text, limit=400):
         text = json.dumps(text, ensure_ascii=False)
     if len(text) > limit:
         text = text[: limit // 2] + " …〔中间省略〕… " + text[-limit // 2 :]
-    return text.replace("\n", " ").replace("|", "\\|")
+    return re.sub(r"\\*\|", lambda _: "\\|", text.replace("\n", " "))
+
+
+def brief_answer(text, web=False):
+    if not web:
+        return text
+    # Report the agent's conclusion, not a second copy of the fetched article.
+    text = re.sub(r"(?m)^>.*$", "", text)
+    text = re.sub(r'["“][^"”\n]{70,}["”]', "〔长引文省略〕", text)
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    return text[:650] + ("\n\n〔后续展开省略〕" if len(text) > 650 else "")
 
 
 def output_summary(action):
@@ -68,6 +79,53 @@ def output_summary(action):
     return compact("；".join(parts) or action.get("status", "无产物"), 650)
 
 
+def tool_summary(tool):
+    raw = tool.get("result", "")
+    try:
+        data = json.loads(raw)
+    except (ValueError, TypeError):
+        # Captured results can be truncated JSON. Avoid reproducing webpage prose.
+        import re
+
+        code = re.search(r'"code"\s*:\s*"([A-Z_]+)"', raw)
+        if "private_" in tool["name"]:
+            evidence = re.findall(r"doc_[0-9a-f]+", raw)
+            return (f"返回码 {code.group(1)}；" if code else "") + (
+                "私有片段 " + ", ".join(dict.fromkeys(evidence))[:200]
+                if evidence
+                else f"私有资料返回摘要 {len(raw)} 字符，状态 {tool['status']}"
+            )
+        urls = re.findall(r'https?://[^\s"<>]+', raw)
+        return (f"返回码 {code.group(1)}；" if code else "") + (
+            "来源 " + ", ".join(dict.fromkeys(urls))[:300]
+            if urls
+            else f"已保存返回摘要 {len(raw)} 字符；状态 {tool['status']}"
+        )
+    if not isinstance(data, dict):
+        return f"返回 {len(data) if isinstance(data, list) else 1} 项数据"
+    meta = {
+        k: data[k]
+        for k in (
+            "code",
+            "status",
+            "evidence_id",
+            "url",
+            "final_url",
+            "next_offset",
+            "content_truncated",
+            "degraded",
+            "error",
+        )
+        if k in data
+    }
+    for key in ("sources", "results", "items"):
+        if isinstance(data.get(key), list):
+            meta[key + "_count"] = len(data[key])
+    if isinstance(data.get("text"), str):
+        meta["text_chars"] = len(data["text"])
+    return compact(meta or {"fields": list(data), "status": tool["status"]}, 500)
+
+
 def representative(group, rows):
     # Deterministic published selection rule, including failures in the summary.
     if group == "boundary":
@@ -77,12 +135,14 @@ def representative(group, rows):
     def richness(r):
         actions = [a for run in r["runs"] for a in run["actions"]]
         tools = sum(len(a["tools"]) for a in actions)
+        tool_types = {t["name"] for a in actions for t in a["tools"]}
         workers = sum(a["role"] == "worker" for a in actions)
         return (
-            tools
+            len(tool_types)
             if group in {"web_retrieval", "hybrid_retrieval", "private_retrieval", "typos"}
             else workers,
             len(r["runs"]),
+            -tools,
             -r["index"],
         )
 
@@ -103,13 +163,19 @@ def render(source, dest):
     complete = sum(r["status"] == "completed" for r in runs)
     actions = [a for r in runs for a in r["actions"]]
     tools = [t for a in actions for t in a["tools"]]
+    false_positives = [
+        r
+        for r in rows
+        if r.get("manual_review", {}).get("classification") == "assertion_false_positive"
+    ]
     lines = [
         "# 100 个真实案例：结果与各类代表执行过程",
         "",
         "测试日期：2026-11-03（北京时间）。当前发布版本在同一五进程部署上运行，数据均为测试构造。",
         "",
         f"共 **{len(rows)} 个场景**，包含 **{len(runs)} 个真实用户运行**、**{len(actions)} 个 A2A 任务**和 **{len(tools)} 次记录到回执的工具调用**。",
-        f"场景断言通过 **{passed}/{len(rows)}**；运行终态 completed **{complete}/{len(runs)}**。API 边界拒绝不产生 Agent 调用，也不伪装成模型回答。",
+        f"场景断言通过 **{passed}/{len(rows)}**；限时内 completed **{complete}/{len(runs)}**。API 边界拒绝不产生 Agent 调用，也不伪装成模型回答。",
+        f"人工复核标记 **{len(false_positives)} 个断言误报**，原自动分数保持不变；其余未通过场景为实际运行失败或超时。",
         "",
         "这些通过率来自明确的字符串、来源、状态和隔离断言，不是独立模型语义评审的准确率。没有将之前的模拟契约测试计入本报告。",
         "",
@@ -127,11 +193,15 @@ def render(source, dest):
         "",
         "## 记录口径",
         "",
+        "- 沿用既有契约测试的 12 类及各类数量，构造适合真实 API 执行的输入；多轮步骤属于同一个场景，场景数、用户运行数、A2A 任务数分别统计。",
+        "- 类内主要使用相同场景脚本的随机编号、金额和轮数变体；100 个执行样本不等于 100 种独立业务流程，本轮不覆盖 OCR 或所有真实文档类型。",
         "- 顺序来自 A2A TaskStore 的真实创建/更新时间。表格按开始时间排序；时间区间重叠表示并发，不表示后一项必须等前一项结束。",
         "- Worker 内部工具调用按持久 journal 的顺序列出；journal 没有单次工具精确时间戳，因此不编造工具耗时。输出只保留摘要。",
         "- Host 负责接收、鉴权、轮次落库、上下文装配、调度和最终提交；状态/摘要/长期事实抽取是 Host 后台任务，不计作额外 A2A 子 Agent。",
         "- 恢复类别是真实 pause/continue；没有在用户正在使用的服务上强制杀进程。进程崩溃能力另由恢复单测验证。",
+        "- 每轮评测期限为360秒。到期即记录timeout并请求停止；之后即使得到迟到答复也不追认通过，迟到产物仅供问题分析。",
         "- 每类优先选择通过且包含较完整执行链的案例；所有失败保留在下一节和机器可读汇总中，不能从代表例推断整类全部通过。",
+        "- 答案中的 `/api/evidence/…` 是测试实例内的引用地址，公开仓库不提供该服务的私有证据数据库；工具返回只展示状态、数量、来源地址等摘要。",
         "",
         "## 失败与限制",
         "",
@@ -144,9 +214,17 @@ def render(source, dest):
     for row in failed:
         bad = [x["name"] for x in row["checks"] if not x["passed"]]
         lines.append(f"- **{row['case_id']}**：{compact(row.get('error') or '、'.join(bad), 500)}")
+        if row.get("manual_review"):
+            lines.append("  - **人工复核**：" + row["manual_review"]["reason"])
         for run in row["runs"]:
             if run["status"] != "completed":
                 lines.append(f"  - {run['status']}：{compact(run['answer'], 300)}")
+                if run.get("status_after_stop") == "completed":
+                    lines.append("  - 该运行随后形成了迟到答复；本次仍按360秒评测超时计数。")
+        if row["runs"] and all(r["status"] == "completed" for r in row["runs"]):
+            lines.append(
+                "  - 虽正常结束，但答案未满足该场景断言：" + compact(row["runs"][-1]["answer"], 350)
+            )
     selected = {}
     for group, label in LABELS.items():
         row = representative(group, groups[group])
@@ -159,6 +237,11 @@ def render(source, dest):
         ]
         for note in row.get("notes", []):
             lines.append(note)
+        if group == "recovery":
+            lines += [
+                "",
+                "**Host 控制动作**：启动运行 → 请求 pause → 观察到 paused → 请求 continue → 检查返回的 run_id 与原运行一致 → 等待同一运行最终终态。下表是该运行合并后的实际 A2A 任务记录。",
+            ]
         if row.get("rejection"):
             reject = row["rejection"]
             lines += [
@@ -185,19 +268,22 @@ def render(source, dest):
                 purpose = spec.get("title") or action.get("operation") or action["role"]
                 interval = f"{action['started'] - start:.2f}→{action['finished'] - start:.2f}"
                 lines.append(
-                    f"| {interval} | {action['role']} · {compact(purpose, 100)} | {output_summary(action)} |"
+                    f"| {interval} | {action['role']} · {compact(purpose, 100)} | {compact(brief_answer(output_summary(action), group in {'web_retrieval', 'hybrid_retrieval'}), 250 if group in {'web_retrieval', 'hybrid_retrieval'} else 650)} |"
                 )
                 for i, tool in enumerate(action["tools"], 1):
                     lines.append(
-                        f"| ↳ 工具 {i} | `{tool['name']}` · {tool['status']} | 参数：{compact(tool['arguments'], 350)}；返回：{compact(tool['result'], 500)} |"
+                        f"| ↳ 工具 {i} | `{tool['name']}` · {tool['status']} | 参数：{compact(tool['arguments'], 350)}；返回：{tool_summary(tool)} |"
                     )
             lines += [
                 "",
-                f"**Host 收尾**：{run['status']}；整轮 {run['elapsed_seconds']} 秒。",
+                f"**Host 收尾**：{run['status']}；整轮 {run['elapsed_seconds']} 秒；Worker 工具调用 {sum(len(a['tools']) for a in run['actions'])} 次。",
                 "",
-                "**最终答案**：",
+                "**最终答案（网页场景展示摘要，省略长引文）**："
+                if group in {"web_retrieval", "hybrid_retrieval"}
+                else "**最终答案**：",
                 "",
-                run["answer"] or "（无最终答案）",
+                brief_answer(run["answer"], group in {"web_retrieval", "hybrid_retrieval"})
+                or "（无最终答案）",
                 "",
                 f"追溯 run_id：`{run['run_id']}`。",
             ]
@@ -208,6 +294,7 @@ def render(source, dest):
         "passed": passed,
         "run_count": len(runs),
         "completed_runs": complete,
+        "assertion_false_positives": len(false_positives),
         "a2a_tasks": len(actions),
         "tool_calls": len(tools),
         "representatives": selected,
@@ -217,8 +304,14 @@ def render(source, dest):
                 "passed": r["passed"],
                 "checks": r["checks"],
                 "error": r.get("error"),
+                "manual_review": r.get("manual_review"),
                 "runs": [
-                    {k: x[k] for k in ("run_id", "status", "elapsed_seconds")} for x in r["runs"]
+                    {
+                        k: x[k]
+                        for k in ("run_id", "status", "elapsed_seconds", "status_after_stop")
+                        if k in x
+                    }
+                    for x in r["runs"]
                 ],
             }
             for r in rows
