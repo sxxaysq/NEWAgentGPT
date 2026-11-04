@@ -109,7 +109,7 @@ def main(source, dest):
         text += f"| {row['case_id']} | {snippet or row.get('error', '未取得审核产物')} |\n"
     text += "\n人工抽查发现：部分长文写作任务的Worker事实摘录与Critic完整成稿验收要求不匹配；Synthesizer之后虽能形成正文，运行仍失败。另有计划自行增加例子数量等用户未明确要求的验收条件。以上是具体记录支持的观察，不代表所有失败均由同一原因造成。\n"
 
-    dest.write_text(text, encoding="utf-8")
+    dest.write_text("\n".join(line.rstrip() for line in text.splitlines()) + "\n", encoding="utf-8")
     summary = json.loads(dest.with_suffix(".json").read_text(encoding="utf-8"))
     summary["mode"] = "natural_language_v2"
     summary["operational_passed"] = sum(
@@ -128,7 +128,7 @@ def main(source, dest):
         f"本轮未逐题人工复核，不报告人工通过率。操作条件通过 **{summary['operational_passed']}/100**；同模型内容评阅通过 **{summary['semantic_review_passed']}/{summary['semantic_review_count']}**，另有 **{summary['not_reviewed']} 例未进入内容评阅**。",
     )
     text += "\n附件：[全部问题与验收重点](NATURAL100_DESIGN.md) · [六篇长文本完整答复](LONG_TEXT_ANSWERS_V2.md) · [机器可读统计](LIVE100_REPORT.json)。\n"
-    dest.write_text(text, encoding="utf-8")
+    dest.write_text("\n".join(line.rstrip() for line in text.splitlines()) + "\n", encoding="utf-8")
     for entry, r in zip(summary["cases"], rows):
         entry["review"] = r.get("review")
     dest.with_suffix(".json").write_text(

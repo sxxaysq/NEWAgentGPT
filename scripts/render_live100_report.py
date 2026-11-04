@@ -38,7 +38,13 @@ def brief_answer(text, web=False):
     text = re.sub(r"(?m)^>.*$", "", text)
     text = re.sub(r'["“][^"”\n]{70,}["”]', "〔长引文省略〕", text)
     text = re.sub(r"\n{3,}", "\n\n", text)
-    return text[:650] + ("\n\n〔后续展开省略〕" if len(text) > 650 else "")
+    if len(text) <= 650:
+        return text
+    excerpt = text[:650]
+    boundary = max(excerpt.rfind("\n\n"), excerpt.rfind("。") + 1)
+    if boundary > 0:
+        excerpt = excerpt[:boundary]
+    return excerpt.rstrip() + "\n\n〔后续展开省略〕"
 
 
 def output_summary(action):
