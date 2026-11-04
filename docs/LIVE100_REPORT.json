@@ -1,23 +1,23 @@
 {
   "scenario_count": 100,
-  "passed": 96,
-  "run_count": 173,
-  "completed_runs": 170,
-  "assertion_false_positives": 1,
-  "a2a_tasks": 910,
-  "tool_calls": 443,
+  "passed": 57,
+  "run_count": 162,
+  "completed_runs": 113,
+  "assertion_false_positives": 0,
+  "a2a_tasks": 1087,
+  "tool_calls": 637,
   "representatives": {
     "single_hop": "single_hop-00",
-    "multi_step": "multi_step-05",
-    "long_text": "long_text-00",
-    "private_retrieval": "private_retrieval-01",
-    "web_retrieval": "web_retrieval-01",
-    "hybrid_retrieval": "hybrid_retrieval-01",
-    "recovery": "recovery-00",
-    "typos": "typos-02",
+    "multi_step": "multi_step-02",
+    "long_text": "long_text-02",
+    "private_retrieval": "private_retrieval-00",
+    "web_retrieval": "web_retrieval-00",
+    "hybrid_retrieval": "hybrid_retrieval-02",
+    "recovery": "recovery-02",
+    "typos": "typos-00",
     "isolation": "isolation-00",
     "in_session": "in_session-07",
-    "cross_session": "cross_session-00",
+    "cross_session": "cross_session-05",
     "boundary": "boundary-00"
   },
   "cases": [
@@ -26,26 +26,64 @@
       "passed": true,
       "checks": [
         {
-          "name": "oversized_input_422",
+          "name": "run_completed",
+          "passed": true
+        },
+        {
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
       "error": null,
       "manual_review": null,
-      "runs": []
+      "runs": [
+        {
+          "run_id": "3d6806f7a14b46fa82313e614c18dd08",
+          "status": "completed",
+          "elapsed_seconds": 12.08
+        }
+      ],
+      "review": {
+        "passed": true,
+        "reason": "模型正确识别出信息缺失，未编造已阅读方案，并自然询问具体方案或评估维度，符合rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "boundary-01",
       "passed": true,
       "checks": [
         {
-          "name": "oversized_input_422",
+          "name": "run_completed",
+          "passed": true
+        },
+        {
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
       "error": null,
       "manual_review": null,
-      "runs": []
+      "runs": [
+        {
+          "run_id": "ddd1c31bbd744e3cb34a9c1aac1bf6d8",
+          "status": "completed",
+          "elapsed_seconds": 11.59
+        }
+      ],
+      "review": {
+        "passed": true,
+        "reason": "模型正确识别缺失附件，未编造数据，并请求补充表格，符合rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "boundary-02",
@@ -56,7 +94,11 @@
           "passed": true
         },
         {
-          "name": "insufficient_data",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -64,11 +106,16 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "e67376f28db946e1a5df8818ff56d59c",
+          "run_id": "7b783b8a0cd54c579a4da15c57db41da",
           "status": "completed",
           "elapsed_seconds": 8.34
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "模型明确回答不知道，未虚构记忆或检索记录，符合rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "boundary-03",
@@ -79,7 +126,11 @@
           "passed": true
         },
         {
-          "name": "insufficient_data",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -87,56 +138,36 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "54e3d687c11c48d4b1525255940fcf53",
+          "run_id": "9b26d9a4a5044421a64f0d6dcda5a802",
           "status": "completed",
-          "elapsed_seconds": 13.11
+          "elapsed_seconds": 14.57
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "回答准确指出了需求中目标场景缺失以及‘便宜’与‘无风险’之间的潜在冲突，并进行了合理的澄清提问，未承诺绝对无风险，符合rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "cross_session-00",
-      "passed": true,
+      "passed": false,
       "checks": [
         {
           "name": "run_completed",
-          "passed": true
-        },
-        {
-          "name": "run_completed",
-          "passed": true
-        },
-        {
-          "name": "cross_thread_recall",
-          "passed": true
-        },
-        {
-          "name": "run_completed",
-          "passed": true
-        },
-        {
-          "name": "disabled_control",
-          "passed": true
+          "passed": false
         }
       ],
-      "error": null,
+      "error": "TimeoutError: No durable memory after 90 seconds",
       "manual_review": null,
       "runs": [
         {
-          "run_id": "b56592ab9922447cbcd0f5d32937587e",
-          "status": "completed",
-          "elapsed_seconds": 10.61
-        },
-        {
-          "run_id": "c2f0841844c448698c567fd140db3b01",
-          "status": "completed",
-          "elapsed_seconds": 10.95
-        },
-        {
-          "run_id": "52163b0d4e47422e9e6802676209ad0a",
-          "status": "completed",
-          "elapsed_seconds": 8.44
+          "run_id": "1418a2518e7f44058045b19cbe2e8821",
+          "status": "failed",
+          "elapsed_seconds": 23.54
         }
-      ]
+      ],
+      "review": null
     },
     {
       "case_id": "cross_session-01",
@@ -151,15 +182,19 @@
           "passed": true
         },
         {
-          "name": "cross_thread_recall",
-          "passed": true
-        },
-        {
           "name": "run_completed",
           "passed": true
         },
         {
-          "name": "disabled_control",
+          "name": "disabled_memory_not_injected",
+          "passed": true
+        },
+        {
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -167,21 +202,26 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "aa68f4a27a1c4249b2d3e406bd21222f",
+          "run_id": "8da29fee57304a4e9c93bec7ef40cb11",
           "status": "completed",
-          "elapsed_seconds": 10.05
+          "elapsed_seconds": 9.93
         },
         {
-          "run_id": "a8a6f560d1944572b07e7acdf39f2c87",
+          "run_id": "a8cda70ea82048e29646ac8c03ae6e6e",
           "status": "completed",
-          "elapsed_seconds": 9.45
+          "elapsed_seconds": 8.78
         },
         {
-          "run_id": "559b2e7808e84e26b96da439da2dfd99",
+          "run_id": "220a32ca760c49bea746ed0de23617b0",
           "status": "completed",
-          "elapsed_seconds": 8.9
+          "elapsed_seconds": 7.77
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "第二轮正确回忆了湖泊沉积，第三轮在记忆关闭后正确表示不知道，符合跨会话记忆测试要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "cross_session-02",
@@ -196,15 +236,19 @@
           "passed": true
         },
         {
-          "name": "cross_thread_recall",
-          "passed": true
-        },
-        {
           "name": "run_completed",
           "passed": true
         },
         {
-          "name": "disabled_control",
+          "name": "disabled_memory_not_injected",
+          "passed": true
+        },
+        {
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -212,21 +256,26 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "3d5d025256e54f65b850752744f0da96",
+          "run_id": "0c4fd2de356245989f065a4f11289cbf",
           "status": "completed",
-          "elapsed_seconds": 10.97
+          "elapsed_seconds": 9.9
         },
         {
-          "run_id": "5c01591683ac4a4a80cdc51fb7894e46",
+          "run_id": "d5b38dbf325e4fe68c766bd93a064450",
           "status": "completed",
-          "elapsed_seconds": 10.4
+          "elapsed_seconds": 9.05
         },
         {
-          "run_id": "6072ba8a7c2d43d5a780c8f20c583311",
+          "run_id": "2f7c4391d8bd4f0d9b34fcc08435798c",
           "status": "completed",
-          "elapsed_seconds": 8.89
+          "elapsed_seconds": 8.55
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "第二轮正确从记忆检索到周四下午交周报；第三轮在记忆关闭后正确表示未检索到该私人事实，符合跨会话记忆隔离要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "cross_session-03",
@@ -241,15 +290,19 @@
           "passed": true
         },
         {
-          "name": "cross_thread_recall",
-          "passed": true
-        },
-        {
           "name": "run_completed",
           "passed": true
         },
         {
-          "name": "disabled_control",
+          "name": "disabled_memory_not_injected",
+          "passed": true
+        },
+        {
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -257,21 +310,26 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "c224a7cd820b4c33a8b3a13195aeb040",
+          "run_id": "276d994f381149dcb16fb7d9b8f61f28",
           "status": "completed",
-          "elapsed_seconds": 10.47
+          "elapsed_seconds": 13.29
         },
         {
-          "run_id": "fe9fd501d45c4e3b8b51a0f6be3bc30f",
+          "run_id": "af38f844f7cd43adb57cbdc054e63153",
           "status": "completed",
-          "elapsed_seconds": 10.54
+          "elapsed_seconds": 8.52
         },
         {
-          "run_id": "468d953921184b399c86ccbed359d1f2",
+          "run_id": "f19379880f6445ec87ce8d147cf6d194",
           "status": "completed",
-          "elapsed_seconds": 7.86
+          "elapsed_seconds": 7.85
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "第二轮正确从记忆回答九点，第三轮关闭记忆后正确表示不知道，符合rubric。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "cross_session-04",
@@ -286,15 +344,19 @@
           "passed": true
         },
         {
-          "name": "cross_thread_recall",
-          "passed": true
-        },
-        {
           "name": "run_completed",
           "passed": true
         },
         {
-          "name": "disabled_control",
+          "name": "disabled_memory_not_injected",
+          "passed": true
+        },
+        {
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -302,21 +364,26 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "c8ee91dd970d4813bc93be5aa692289a",
+          "run_id": "6c0bb32bbff54e8a9b4f7a0f34bf1079",
           "status": "completed",
-          "elapsed_seconds": 10.57
+          "elapsed_seconds": 13.67
         },
         {
-          "run_id": "3c1b71901c5c4ed3b1ca7374f3118032",
+          "run_id": "c9833d1df8654c018574346cc133945e",
           "status": "completed",
-          "elapsed_seconds": 11.06
+          "elapsed_seconds": 9.17
         },
         {
-          "run_id": "ae019463f08c4633b047fa49418a2263",
+          "run_id": "e9af8d887dc14a25a498125609b06ba0",
           "status": "completed",
-          "elapsed_seconds": 8.44
+          "elapsed_seconds": 9.46
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "第二轮正确从记忆回答游泳，第三轮关闭记忆后正确表示不知道，符合跨会话记忆规则。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "cross_session-05",
@@ -331,15 +398,19 @@
           "passed": true
         },
         {
-          "name": "cross_thread_recall",
-          "passed": true
-        },
-        {
           "name": "run_completed",
           "passed": true
         },
         {
-          "name": "disabled_control",
+          "name": "disabled_memory_not_injected",
+          "passed": true
+        },
+        {
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -347,25 +418,30 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "3a86fdabeace4a8d9535d0b62c7d59bf",
+          "run_id": "0efaff8b33584bfc88ddb58597ce232a",
           "status": "completed",
-          "elapsed_seconds": 9.41
+          "elapsed_seconds": 8.97
         },
         {
-          "run_id": "12fe36eb201c45f680988bcfef9b1bb9",
+          "run_id": "aae5d340b8d342e19c8c3ee111712461",
           "status": "completed",
-          "elapsed_seconds": 9.6
+          "elapsed_seconds": 8.91
         },
         {
-          "run_id": "94f3c9e079e84265833da33b87b8a3a5",
+          "run_id": "21497e0f8b5c4dbbaff162643c09eddb",
           "status": "completed",
-          "elapsed_seconds": 9.57
+          "elapsed_seconds": 16.41
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "第二轮正确从记忆回答Obsidian，第三轮关闭记忆后正确表示不知道，符合rubric。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "cross_session-06",
-      "passed": true,
+      "passed": false,
       "checks": [
         {
           "name": "run_completed",
@@ -376,37 +452,46 @@
           "passed": true
         },
         {
-          "name": "cross_thread_recall",
-          "passed": true
-        },
-        {
           "name": "run_completed",
           "passed": true
         },
         {
-          "name": "disabled_control",
+          "name": "disabled_memory_not_injected",
           "passed": true
+        },
+        {
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
+          "passed": false
         }
       ],
       "error": null,
       "manual_review": null,
       "runs": [
         {
-          "run_id": "c2b7bac8c5c54588998cce46e02d4c10",
+          "run_id": "22619ca6d7f94a8680fca9d0f92d7ba7",
           "status": "completed",
-          "elapsed_seconds": 9.98
+          "elapsed_seconds": 11.51
         },
         {
-          "run_id": "20077e6773334e46a73e0bdc9d57e928",
+          "run_id": "3d10aa73b4494f17be94f5ab53e3bdcc",
           "status": "completed",
-          "elapsed_seconds": 9.61
+          "elapsed_seconds": 11.25
         },
         {
-          "run_id": "c855a925f0b84218bb4edc0bd9afd904",
+          "run_id": "1f3ce976e5ef42c28be86bea2f2add41",
           "status": "completed",
-          "elapsed_seconds": 7.9
+          "elapsed_seconds": 9.97
         }
-      ]
+      ],
+      "review": {
+        "passed": false,
+        "reason": "第二轮回答未从记忆中检索到第一轮存储的“售后培训”信息，未能正确回答用户负责的工作内容，不符合跨会话记忆保持的要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "cross_session-07",
@@ -421,15 +506,19 @@
           "passed": true
         },
         {
-          "name": "cross_thread_recall",
-          "passed": true
-        },
-        {
           "name": "run_completed",
           "passed": true
         },
         {
-          "name": "disabled_control",
+          "name": "disabled_memory_not_injected",
+          "passed": true
+        },
+        {
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -437,66 +526,46 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "82db3f1376f741d3b521b9725eb6ba9c",
+          "run_id": "02a9ae1c867147d98fafe7deabd5fe04",
           "status": "completed",
-          "elapsed_seconds": 10.22
+          "elapsed_seconds": 9.9
         },
         {
-          "run_id": "1cc13f73c7f94e42a62a4de9b3f8a997",
+          "run_id": "5fd754edcb49443e8a03695de5fe9859",
           "status": "completed",
-          "elapsed_seconds": 10.03
+          "elapsed_seconds": 10.14
         },
         {
-          "run_id": "d99c62db02964dacaabc5aa96f3e5156",
+          "run_id": "75577bbc69c74f5e8f8f7e194f87c100",
           "status": "completed",
-          "elapsed_seconds": 10.5
+          "elapsed_seconds": 13.62
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "第二轮正确从记忆召回火车偏好；第三轮在记忆关闭后正确表示不知道，符合跨会话记忆隔离要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "cross_session-08",
-      "passed": true,
+      "passed": false,
       "checks": [
         {
           "name": "run_completed",
-          "passed": true
-        },
-        {
-          "name": "run_completed",
-          "passed": true
-        },
-        {
-          "name": "cross_thread_recall",
-          "passed": true
-        },
-        {
-          "name": "run_completed",
-          "passed": true
-        },
-        {
-          "name": "disabled_control",
-          "passed": true
+          "passed": false
         }
       ],
-      "error": null,
+      "error": "TimeoutError: No durable memory after 90 seconds",
       "manual_review": null,
       "runs": [
         {
-          "run_id": "14c02881260e4dcaa04333bbe4f7a2db",
-          "status": "completed",
-          "elapsed_seconds": 10.18
-        },
-        {
-          "run_id": "d43231b2fcc440f392e5245bd793313c",
-          "status": "completed",
-          "elapsed_seconds": 10.56
-        },
-        {
-          "run_id": "d3918183ad1b42feae339a75bdc1be90",
-          "status": "completed",
-          "elapsed_seconds": 8.46
+          "run_id": "04b924109522410fb36f0259328b7fa3",
+          "status": "failed",
+          "elapsed_seconds": 29.32
         }
-      ]
+      ],
+      "review": null
     },
     {
       "case_id": "cross_session-09",
@@ -511,15 +580,19 @@
           "passed": true
         },
         {
-          "name": "cross_thread_recall",
-          "passed": true
-        },
-        {
           "name": "run_completed",
           "passed": true
         },
         {
-          "name": "disabled_control",
+          "name": "disabled_memory_not_injected",
+          "passed": true
+        },
+        {
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -527,194 +600,241 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "777557fefe434340bed499874f4af9a1",
+          "run_id": "884f330a2b3f40ea8cbbcd1624dc5b8c",
           "status": "completed",
-          "elapsed_seconds": 11.13
+          "elapsed_seconds": 8.94
         },
         {
-          "run_id": "2ccadc6f35514e92b9fb7a628deaece8",
+          "run_id": "2912193b04984385a0faec6712db6c87",
           "status": "completed",
-          "elapsed_seconds": 10.01
+          "elapsed_seconds": 6.94
         },
         {
-          "run_id": "b10f82b534c2474e963f7e99dc360c29",
+          "run_id": "0a70ad1da2b74d61a719f5a2d0f37702",
           "status": "completed",
-          "elapsed_seconds": 8.3
+          "elapsed_seconds": 7.96
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "第二轮正确从记忆回答栗子，第三轮关闭记忆后正确表示不知道，符合rubric。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "hybrid_retrieval-00",
       "passed": false,
       "checks": [],
-      "error": "TimeoutError: run a12293391dd748d78eddbab6e9e85d2a exceeded 360s",
+      "error": "TimeoutError: run 31cb5f25f12a42b396aefa5b31c78d30 exceeded 360s",
       "manual_review": null,
       "runs": [
         {
-          "run_id": "a12293391dd748d78eddbab6e9e85d2a",
+          "run_id": "31cb5f25f12a42b396aefa5b31c78d30",
           "status": "timeout",
           "elapsed_seconds": 360,
           "status_after_stop": "stopped"
         }
-      ]
+      ],
+      "review": null
     },
     {
       "case_id": "hybrid_retrieval-01",
-      "passed": true,
-      "checks": [
-        {
-          "name": "run_completed",
-          "passed": true
-        },
-        {
-          "name": "private_answer_and_citation",
-          "passed": true
-        },
-        {
-          "name": "private_tool_used",
-          "passed": true
-        },
-        {
-          "name": "web_tool_used",
-          "passed": true
-        }
-      ],
-      "error": null,
+      "passed": false,
+      "checks": [],
+      "error": "TimeoutError: run 5a674ae28ca84e809475e03705001228 exceeded 360s",
       "manual_review": null,
       "runs": [
         {
-          "run_id": "dd040eebab15408b8ad011149f07b057",
-          "status": "completed",
-          "elapsed_seconds": 122.61
+          "run_id": "5a674ae28ca84e809475e03705001228",
+          "status": "timeout",
+          "elapsed_seconds": 360,
+          "status_after_stop": "stopped"
         }
-      ]
+      ],
+      "review": null
     },
     {
       "case_id": "hybrid_retrieval-02",
-      "passed": true,
+      "passed": false,
       "checks": [
         {
           "name": "run_completed",
+          "passed": false
+        },
+        {
+          "name": "private_retrieval_observed",
+          "passed": false
+        },
+        {
+          "name": "web_retrieval_observed",
           "passed": true
         },
         {
-          "name": "private_answer_and_citation",
+          "name": "no_placeholder_answer",
           "passed": true
         },
         {
-          "name": "private_tool_used",
-          "passed": true
-        },
-        {
-          "name": "web_tool_used",
-          "passed": true
+          "name": "model_rubric_review",
+          "passed": false
         }
       ],
       "error": null,
       "manual_review": null,
       "runs": [
         {
-          "run_id": "4e2db14d5f8a447abbbb4f3219578fd3",
-          "status": "completed",
-          "elapsed_seconds": 321.66
+          "run_id": "c54437f188c841679fdab83013daadc1",
+          "status": "failed",
+          "elapsed_seconds": 293.09
         }
-      ]
+      ],
+      "review": {
+        "passed": false,
+        "reason": "回答未结合提供的具体约束（3000篇文档、10人、离线、日增50篇）进行针对性分析，而是给出了通用的SQLite FTS5能力与限制介绍，未体现对特定场景边界的结合。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "hybrid_retrieval-03",
-      "passed": true,
+      "passed": false,
       "checks": [
         {
           "name": "run_completed",
+          "passed": false
+        },
+        {
+          "name": "private_retrieval_observed",
+          "passed": false
+        },
+        {
+          "name": "web_retrieval_observed",
           "passed": true
         },
         {
-          "name": "private_answer_and_citation",
+          "name": "no_placeholder_answer",
           "passed": true
         },
         {
-          "name": "private_tool_used",
-          "passed": true
-        },
-        {
-          "name": "web_tool_used",
-          "passed": true
+          "name": "model_rubric_review",
+          "passed": false
         }
       ],
       "error": null,
       "manual_review": null,
       "runs": [
         {
-          "run_id": "7e764c11ea4a4336a71c1bf367070221",
-          "status": "completed",
-          "elapsed_seconds": 300.4
+          "run_id": "037a783f14b7451ba0739a9c53eadc6d",
+          "status": "failed",
+          "elapsed_seconds": 220.81
         }
-      ]
+      ],
+      "review": {
+        "passed": false,
+        "reason": "回答未结合文档中提供的具体约束（周六下午、住武林广场、8岁儿童、减少跨城交通），反而向用户询问这些已知信息，且因工具故障未能提供基于通用知识的合理备选方案（如距离武林广场更近的浙江省博物馆孤山馆区或杭州博物馆），不符合rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "hybrid_retrieval-04",
       "passed": false,
-      "checks": [],
-      "error": "TimeoutError: run d40a9b2b87414082b860567497667ca5 exceeded 360s",
+      "checks": [
+        {
+          "name": "run_completed",
+          "passed": false
+        },
+        {
+          "name": "private_retrieval_observed",
+          "passed": false
+        },
+        {
+          "name": "web_retrieval_observed",
+          "passed": true
+        },
+        {
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
+          "passed": false
+        }
+      ],
+      "error": null,
       "manual_review": null,
       "runs": [
         {
-          "run_id": "d40a9b2b87414082b860567497667ca5",
-          "status": "timeout",
-          "elapsed_seconds": 360,
-          "status_after_stop": "stopped"
+          "run_id": "2a58b67411304e32964ae56800f7680e",
+          "status": "failed",
+          "elapsed_seconds": 318.31
         }
-      ]
+      ],
+      "review": {
+        "passed": false,
+        "reason": "未能结合机器条件与官方安装要求，未体现隔离环境限制，且未提供两类来源信息。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "hybrid_retrieval-05",
-      "passed": true,
+      "passed": false,
       "checks": [
         {
           "name": "run_completed",
+          "passed": false
+        },
+        {
+          "name": "private_retrieval_observed",
           "passed": true
         },
         {
-          "name": "private_answer_and_citation",
+          "name": "web_retrieval_observed",
           "passed": true
         },
         {
-          "name": "private_tool_used",
+          "name": "no_placeholder_answer",
           "passed": true
         },
         {
-          "name": "web_tool_used",
-          "passed": true
+          "name": "model_rubric_review",
+          "passed": false
         }
       ],
       "error": null,
       "manual_review": null,
       "runs": [
         {
-          "run_id": "4b919732dfe343eab2b068c09ed85392",
-          "status": "completed",
-          "elapsed_seconds": 190.99
+          "run_id": "be6d69194948476d8ed9962f53936406",
+          "status": "failed",
+          "elapsed_seconds": 211.67
         }
-      ]
+      ],
+      "review": {
+        "passed": false,
+        "reason": "所有外部检索与私有知识库均失败或未命中，回答未提供结合预算、人手、禁收品类的轻量可执行安排，也未给出两类来源，不满足rubric。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "in_session-00",
-      "passed": true,
+      "passed": false,
       "checks": [
         {
           "name": "run_completed",
-          "passed": true
+          "passed": false
         },
         {
           "name": "run_completed",
-          "passed": true
+          "passed": false
         },
         {
           "name": "run_completed",
+          "passed": false
+        },
+        {
+          "name": "no_placeholder_answer",
           "passed": true
         },
         {
-          "name": "correction_and_constraints",
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -722,29 +842,34 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "6ef2f6d6905442228e516b7d08e35fed",
-          "status": "completed",
-          "elapsed_seconds": 20.9
+          "run_id": "c2146a82e7de4747be0960a9e686582f",
+          "status": "failed",
+          "elapsed_seconds": 22.99
         },
         {
-          "run_id": "c59de7d9457746779922770a6e29323c",
-          "status": "completed",
-          "elapsed_seconds": 17.12
+          "run_id": "94fe92daf9964fe2bdac6726d236417a",
+          "status": "failed",
+          "elapsed_seconds": 22.43
         },
         {
-          "run_id": "b32b879ee1434b998e384964b7a8eae8",
-          "status": "completed",
-          "elapsed_seconds": 18.09
+          "run_id": "2f73fdda35d84916b1d829e0489fea51",
+          "status": "failed",
+          "elapsed_seconds": 27.19
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "虽然工具调用失败导致无法提供具体行程，但模型在第三轮回答中正确识别并保留了用户修正后的预算约束（800元），未将已作废的1000元作为当前要求，符合rubric中关于正确承接纠正和保留有效约束的核心要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "in_session-01",
-      "passed": true,
+      "passed": false,
       "checks": [
         {
           "name": "run_completed",
-          "passed": true
+          "passed": false
         },
         {
           "name": "run_completed",
@@ -755,7 +880,11 @@
           "passed": true
         },
         {
-          "name": "correction_and_constraints",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -763,40 +892,49 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "ac317179fefe46a78637f5e8c310888a",
-          "status": "completed",
-          "elapsed_seconds": 14.59
+          "run_id": "7c58eb3d9e5a464aa179f973d1b18f19",
+          "status": "failed",
+          "elapsed_seconds": 33.41
         },
         {
-          "run_id": "7394ab4707af44bdbd4f7641868ad08d",
+          "run_id": "5a73081eb56149adbba1ea1a17afa8c8",
           "status": "completed",
-          "elapsed_seconds": 12.59
+          "elapsed_seconds": 22.47
         },
         {
-          "run_id": "4b7089c37e2c40bdbbc20206bdf0a0ac",
+          "run_id": "3858999d5431426384e1928a05b8e520",
           "status": "completed",
-          "elapsed_seconds": 17.49
+          "elapsed_seconds": 22.44
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "模型正确识别并应用了第二轮将时间从20分钟修改为10分钟的约束，在第三轮回答中基于10分钟进行时间分配，未沿用已作废的20分钟条件，且保留了“重点方法和实验”这一有效约束。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "in_session-02",
-      "passed": true,
+      "passed": false,
       "checks": [
         {
           "name": "run_completed",
-          "passed": true
+          "passed": false
         },
         {
           "name": "run_completed",
-          "passed": true
+          "passed": false
         },
         {
           "name": "run_completed",
+          "passed": false
+        },
+        {
+          "name": "no_placeholder_answer",
           "passed": true
         },
         {
-          "name": "correction_and_constraints",
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -804,21 +942,26 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "b58e8cae82394a1bbe48c7eccbfd49eb",
-          "status": "completed",
-          "elapsed_seconds": 17.28
+          "run_id": "03a227ef098f41bb8d8fdb4cb5e52bb8",
+          "status": "failed",
+          "elapsed_seconds": 27.7
         },
         {
-          "run_id": "94f7a885d8434992b22697cf002963b8",
-          "status": "completed",
-          "elapsed_seconds": 20.03
+          "run_id": "1164e19a30474a26bfb45a5078fa0a42",
+          "status": "failed",
+          "elapsed_seconds": 29.15
         },
         {
-          "run_id": "0962eabb480840e9bb63fa20b5aa830f",
-          "status": "completed",
-          "elapsed_seconds": 18.73
+          "run_id": "27adcabb0359499b9c138bdf3c681644",
+          "status": "failed",
+          "elapsed_seconds": 37.38
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "模型正确承接了第二轮的预算纠正（3500元），并在第三轮回答中准确使用了更新后的约束条件，未将已作废的4000元作为当前要求。虽然因工具调用失败未能提供具体型号，但逻辑框架和约束继承符合Rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "in_session-03",
@@ -837,7 +980,11 @@
           "passed": true
         },
         {
-          "name": "correction_and_constraints",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -845,25 +992,30 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "3e15325e41bc4338981c18adb4222cca",
+          "run_id": "236f6b627c8049e38b4a9d78b9f4d939",
           "status": "completed",
-          "elapsed_seconds": 14.18
+          "elapsed_seconds": 34.64
         },
         {
-          "run_id": "592c1ad137db4613afacd96c4876868a",
+          "run_id": "eae221ecf219473e8e0d692b32eaefce",
           "status": "completed",
-          "elapsed_seconds": 14.63
+          "elapsed_seconds": 34.23
         },
         {
-          "run_id": "fb3939a5fcdc484dbef952b115870df9",
+          "run_id": "611ab094be294a4a9cc9cb7c2faff066",
           "status": "completed",
-          "elapsed_seconds": 15.12
+          "elapsed_seconds": 39.53
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "第二轮正确将人数更新为8人并保留1小时时长；第三轮基于8人、1小时的当前约束给出主持安排，未沿用已作废的15人条件。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "in_session-04",
-      "passed": true,
+      "passed": false,
       "checks": [
         {
           "name": "run_completed",
@@ -878,7 +1030,11 @@
           "passed": true
         },
         {
-          "name": "correction_and_constraints",
+          "name": "no_placeholder_answer",
+          "passed": false
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -886,21 +1042,26 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "df84ae7609e44bd1800a439d12ac2fa2",
+          "run_id": "487c967874ab4a59975d3ce3ed4f7bb0",
           "status": "completed",
-          "elapsed_seconds": 23.69
+          "elapsed_seconds": 17.27
         },
         {
-          "run_id": "2886fc5ae1fe4fd3b8bb9f737a8cafe8",
+          "run_id": "246afa66514f4eb5b6256bf33b33b47a",
           "status": "completed",
-          "elapsed_seconds": 20.32
+          "elapsed_seconds": 17.49
         },
         {
-          "run_id": "5f085ceb9ff34b9e88d50cea43ca315c",
+          "run_id": "3fbe1bcb1f9d46ddab5155a6458f0b62",
           "status": "completed",
-          "elapsed_seconds": 30.24
+          "elapsed_seconds": 21.89
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "模型正确承接了第二轮关于收件人身份（同组同事）的纠正，在第三轮重写时保持了同事间的自然语气，未再使用针对客户的敬语或正式措辞，符合rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "in_session-05",
@@ -919,7 +1080,11 @@
           "passed": true
         },
         {
-          "name": "correction_and_constraints",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -927,62 +1092,76 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "6adaddddfa674719958f1c6981b3de24",
+          "run_id": "6af776532cad4f21977c42d0b87fa5c8",
           "status": "completed",
-          "elapsed_seconds": 13.13
+          "elapsed_seconds": 39.26
         },
         {
-          "run_id": "e86260edfb3d4d7b9ddaf69a3035c930",
+          "run_id": "bd9b467f33ae48eaac37fb36117d6b39",
           "status": "completed",
-          "elapsed_seconds": 15.59
+          "elapsed_seconds": 33.79
         },
         {
-          "run_id": "b3d40b055dac4de68f87bbcd353c3b0e",
+          "run_id": "feb7a2637d804e8e9f2913b9a89107fe",
           "status": "completed",
-          "elapsed_seconds": 18.68
+          "elapsed_seconds": 28.29
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "模型正确承接了第二轮的时间约束变更（从1小时改为30分钟），并在第三轮回答中准确使用了30分钟的约束条件，未将已作废的1小时条件作为当前要求，同时保留了周末不学等其他有效约束。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "in_session-06",
-      "passed": true,
+      "passed": false,
       "checks": [
         {
           "name": "run_completed",
-          "passed": true
+          "passed": false
         },
         {
           "name": "run_completed",
-          "passed": true
+          "passed": false
         },
         {
           "name": "run_completed",
+          "passed": false
+        },
+        {
+          "name": "no_placeholder_answer",
           "passed": true
         },
         {
-          "name": "correction_and_constraints",
-          "passed": true
+          "name": "model_rubric_review",
+          "passed": false
         }
       ],
       "error": null,
       "manual_review": null,
       "runs": [
         {
-          "run_id": "3b0d23c1083f4c4a94fcb3e3e61d539f",
-          "status": "completed",
-          "elapsed_seconds": 16.61
+          "run_id": "f3f689bf60f14b6bb2b7b5956a260ca3",
+          "status": "failed",
+          "elapsed_seconds": 12.68
         },
         {
-          "run_id": "34df182026da4fb29d6e90a8c76b00ee",
-          "status": "completed",
-          "elapsed_seconds": 15.25
+          "run_id": "1b1216f4ba19430aa4979b5d6677dcec",
+          "status": "failed",
+          "elapsed_seconds": 25.99
         },
         {
-          "run_id": "51f29708a34e490ea5ddd2d8832719ce",
-          "status": "completed",
-          "elapsed_seconds": 17.85
+          "run_id": "3a8cff4e87774836927e24df5af02758",
+          "status": "failed",
+          "elapsed_seconds": 22.44
         }
-      ]
+      ],
+      "review": {
+        "passed": false,
+        "reason": "所有轮次均因工具执行失败未返回实质内容，未能正确承接纠正或提供基于当前约束（n=3/组）的分析建议，不满足rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "in_session-07",
@@ -1001,11 +1180,11 @@
           "passed": true
         },
         {
-          "name": "run_completed",
+          "name": "no_placeholder_answer",
           "passed": true
         },
         {
-          "name": "correction_and_constraints",
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -1013,76 +1192,76 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "7690d136a6cf4173992cbb20e993e35f",
+          "run_id": "9a7aea2fbd0d4fe9bccab386c7b19733",
           "status": "completed",
-          "elapsed_seconds": 12.53
+          "elapsed_seconds": 23.97
         },
         {
-          "run_id": "c14c17c69c824d00bd0aa41906493956",
+          "run_id": "a2fd8b7522664590b52d7d43aca2710b",
           "status": "completed",
-          "elapsed_seconds": 14.06
+          "elapsed_seconds": 63.48
         },
         {
-          "run_id": "6a6403163d6f4d2092ff1d8ec81ac79b",
+          "run_id": "a627224b4c3a47ed8e85e9a02eaa46d6",
           "status": "completed",
-          "elapsed_seconds": 9.96
-        },
-        {
-          "run_id": "c811ee411ff74c1798ee1ce07a790ff5",
-          "status": "completed",
-          "elapsed_seconds": 20.82
+          "elapsed_seconds": 29.46
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "模型正确承接了人数从6人增加到8人的变化，并准确保留了‘1人忌辣’和新增的‘1人吃素’这两个关键约束。在第三轮回答中，菜单设计合理，明确区分了忌辣者和素食者的可选菜品，未将已作废的6人条件当作当前要求，符合rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "in_session-08",
-      "passed": true,
+      "passed": false,
       "checks": [
         {
           "name": "run_completed",
-          "passed": true
+          "passed": false
         },
         {
           "name": "run_completed",
-          "passed": true
+          "passed": false
         },
         {
           "name": "run_completed",
+          "passed": false
+        },
+        {
+          "name": "no_placeholder_answer",
           "passed": true
         },
         {
-          "name": "run_completed",
-          "passed": true
-        },
-        {
-          "name": "correction_and_constraints",
-          "passed": true
+          "name": "model_rubric_review",
+          "passed": false
         }
       ],
       "error": null,
       "manual_review": null,
       "runs": [
         {
-          "run_id": "b9db27566b974d54a0cf72641660c77e",
-          "status": "completed",
-          "elapsed_seconds": 18.82
+          "run_id": "d1fcab3d56114f15b95b0cf13875389d",
+          "status": "failed",
+          "elapsed_seconds": 17.25
         },
         {
-          "run_id": "698afe85271144e38de13f4b43d22987",
-          "status": "completed",
-          "elapsed_seconds": 18.26
+          "run_id": "53e7c1880495468dbcac3091b8803a67",
+          "status": "failed",
+          "elapsed_seconds": 13.21
         },
         {
-          "run_id": "4f9827706b0349c38c474c608b96e8c1",
-          "status": "completed",
-          "elapsed_seconds": 14.59
-        },
-        {
-          "run_id": "0dbac11cd6ec43fb9a2d9c777ef661bf",
-          "status": "completed",
-          "elapsed_seconds": 18.38
+          "run_id": "a20b22e5a2324f9099af3044260a9e32",
+          "status": "failed",
+          "elapsed_seconds": 16.08
         }
-      ]
+      ],
+      "review": {
+        "passed": false,
+        "reason": "模型未能提供实质性的技术建议或检查清单，仅复述了约束条件，未满足用户关于‘优先检查哪些地方’的咨询需求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "in_session-09",
@@ -1101,11 +1280,11 @@
           "passed": true
         },
         {
-          "name": "run_completed",
+          "name": "no_placeholder_answer",
           "passed": true
         },
         {
-          "name": "correction_and_constraints",
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -1113,179 +1292,29 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "c9dba7dd99f542fc80fdb96903955e20",
+          "run_id": "a81711b00e2f4449b026af1c46f30a88",
           "status": "completed",
-          "elapsed_seconds": 16.66
+          "elapsed_seconds": 41.46
         },
         {
-          "run_id": "194840231e0f435581a8b3e429a93512",
+          "run_id": "8546074b815046969e63b45a04ffab8d",
           "status": "completed",
-          "elapsed_seconds": 19.26
+          "elapsed_seconds": 23.17
         },
         {
-          "run_id": "a5849b14bb254304bb3152c01e2af9d3",
+          "run_id": "703c00f56b0e460ba5808ab5eae1fc0c",
           "status": "completed",
-          "elapsed_seconds": 13.07
-        },
-        {
-          "run_id": "7f42e51d305e45dbad691945e962a180",
-          "status": "completed",
-          "elapsed_seconds": 21.96
+          "elapsed_seconds": 25.09
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "模型正确承接了字数从300字修改为150字的指令，并在后续回答中始终基于150字和跨专业读者这两个有效约束提供建议，未将已作废的300字作为当前要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "in_session-10",
-      "passed": true,
-      "checks": [
-        {
-          "name": "run_completed",
-          "passed": true
-        },
-        {
-          "name": "run_completed",
-          "passed": true
-        },
-        {
-          "name": "run_completed",
-          "passed": true
-        },
-        {
-          "name": "run_completed",
-          "passed": true
-        },
-        {
-          "name": "correction_and_constraints",
-          "passed": true
-        }
-      ],
-      "error": null,
-      "manual_review": null,
-      "runs": [
-        {
-          "run_id": "996b0542a4484a81a2fff7b50b85981a",
-          "status": "completed",
-          "elapsed_seconds": 21.94
-        },
-        {
-          "run_id": "21471d5cb7d3413f8cdf65dc3a684084",
-          "status": "completed",
-          "elapsed_seconds": 20.3
-        },
-        {
-          "run_id": "4a74ece54b5a4c2cac3a2b92b943c75f",
-          "status": "completed",
-          "elapsed_seconds": 14.68
-        },
-        {
-          "run_id": "ae4f0715f3f14a76ad3bcb84af4ea70d",
-          "status": "completed",
-          "elapsed_seconds": 24.08
-        }
-      ]
-    },
-    {
-      "case_id": "in_session-11",
-      "passed": true,
-      "checks": [
-        {
-          "name": "run_completed",
-          "passed": true
-        },
-        {
-          "name": "run_completed",
-          "passed": true
-        },
-        {
-          "name": "run_completed",
-          "passed": true
-        },
-        {
-          "name": "run_completed",
-          "passed": true
-        },
-        {
-          "name": "correction_and_constraints",
-          "passed": true
-        }
-      ],
-      "error": null,
-      "manual_review": null,
-      "runs": [
-        {
-          "run_id": "13defd8649e748eda7d4eaf77cd7589c",
-          "status": "completed",
-          "elapsed_seconds": 15.65
-        },
-        {
-          "run_id": "a3f70d1247d9465c9ef54bdd41a06f3f",
-          "status": "completed",
-          "elapsed_seconds": 15.7
-        },
-        {
-          "run_id": "bb83dfd1debb4eebbd938d7dce2c800f",
-          "status": "completed",
-          "elapsed_seconds": 14.74
-        },
-        {
-          "run_id": "55e35d03bd64495e94791cf67c952a66",
-          "status": "completed",
-          "elapsed_seconds": 19.93
-        }
-      ]
-    },
-    {
-      "case_id": "in_session-12",
-      "passed": true,
-      "checks": [
-        {
-          "name": "run_completed",
-          "passed": true
-        },
-        {
-          "name": "run_completed",
-          "passed": true
-        },
-        {
-          "name": "run_completed",
-          "passed": true
-        },
-        {
-          "name": "run_completed",
-          "passed": true
-        },
-        {
-          "name": "correction_and_constraints",
-          "passed": true
-        }
-      ],
-      "error": null,
-      "manual_review": null,
-      "runs": [
-        {
-          "run_id": "28262eb4c0574d49b606593cb36edf48",
-          "status": "completed",
-          "elapsed_seconds": 16.16
-        },
-        {
-          "run_id": "3965d750c4b649a3bdcb9fae8010603c",
-          "status": "completed",
-          "elapsed_seconds": 17.75
-        },
-        {
-          "run_id": "990c46e2b3004ca185f5cc334a84a278",
-          "status": "completed",
-          "elapsed_seconds": 14.21
-        },
-        {
-          "run_id": "bd128455d4d5441f80d14c3e3a3b96f0",
-          "status": "completed",
-          "elapsed_seconds": 20.92
-        }
-      ]
-    },
-    {
-      "case_id": "in_session-13",
       "passed": false,
       "checks": [
         {
@@ -1301,44 +1330,141 @@
           "passed": true
         },
         {
-          "name": "run_completed",
+          "name": "no_placeholder_answer",
           "passed": true
         },
         {
-          "name": "correction_and_constraints",
+          "name": "model_rubric_review",
           "passed": false
         }
       ],
       "error": null,
-      "manual_review": {
-        "classification": "assertion_false_positive",
-        "reason": "英文表格当前预算为CNY 180,000；说明文字中的23仅出现在预算由23万元更新为18万元的历史描述中，并未恢复旧约束。保留自动断言passed=false，不改写原始分数。"
-      },
+      "manual_review": null,
       "runs": [
         {
-          "run_id": "e54607cb770844f7ad37e0caae5abd14",
+          "run_id": "3beba62e65ea42aaa769206d6b7b6ebf",
           "status": "completed",
-          "elapsed_seconds": 17.18
+          "elapsed_seconds": 10.58
         },
         {
-          "run_id": "8e010952742b45a98f47e6c7feb0f9fc",
+          "run_id": "4cc5ac82856c45b1b51e076cea138fff",
           "status": "completed",
-          "elapsed_seconds": 18.32
+          "elapsed_seconds": 13.15
         },
         {
-          "run_id": "d49681fcc1e44c5d92736dacb9c182a4",
+          "run_id": "47d1ae38c1b14c7286f5844c53c416f0",
           "status": "completed",
-          "elapsed_seconds": 16.27
-        },
-        {
-          "run_id": "1860c2d3469c4d29af04cdaf0f1101d6",
-          "status": "completed",
-          "elapsed_seconds": 21.46
+          "elapsed_seconds": 13.64
         }
-      ]
+      ],
+      "review": {
+        "passed": false,
+        "reason": "第二轮回答错误地将“改周五晚上”理解为“周五晚上可用”，未正确承接“值班”这一核心约束的变更（原为周六值班，现改为周五晚上值班），导致第三轮总结中将周五晚上标记为“可用”而非“值班”，违反了rubric中“正确承接纠正”及“不把已作废条件当当前要求”（此处虽未保留周六，但错误解读了周五的状态）的要求。",
+        "uncertain": false
+      }
     },
     {
-      "case_id": "isolation-00",
+      "case_id": "in_session-11",
+      "passed": false,
+      "checks": [
+        {
+          "name": "run_completed",
+          "passed": false
+        },
+        {
+          "name": "run_completed",
+          "passed": false
+        },
+        {
+          "name": "run_completed",
+          "passed": false
+        },
+        {
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
+          "passed": false
+        }
+      ],
+      "error": null,
+      "manual_review": null,
+      "runs": [
+        {
+          "run_id": "bb6b275e6b3644ad8b48f11b1e546ad2",
+          "status": "failed",
+          "elapsed_seconds": 22.99
+        },
+        {
+          "run_id": "812d6dcb491c405696a02b8d4860b1ac",
+          "status": "failed",
+          "elapsed_seconds": 28.95
+        },
+        {
+          "run_id": "06d681fda7984d1b99a2bf9c416411c5",
+          "status": "failed",
+          "elapsed_seconds": 33.61
+        }
+      ],
+      "review": {
+        "passed": false,
+        "reason": "模型未能提供实质性的复习重点调整建议，仅重复工具调用失败的信息，未满足用户获取具体指导的需求。",
+        "uncertain": false
+      }
+    },
+    {
+      "case_id": "in_session-12",
+      "passed": false,
+      "checks": [
+        {
+          "name": "run_completed",
+          "passed": false
+        },
+        {
+          "name": "run_completed",
+          "passed": true
+        },
+        {
+          "name": "run_completed",
+          "passed": false
+        },
+        {
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
+          "passed": true
+        }
+      ],
+      "error": null,
+      "manual_review": null,
+      "runs": [
+        {
+          "run_id": "08fe2ac083c340ffaf5fad668c7469d5",
+          "status": "failed",
+          "elapsed_seconds": 42.18
+        },
+        {
+          "run_id": "16d537f36a514a2386aa7ba3c117d2f2",
+          "status": "completed",
+          "elapsed_seconds": 78.15
+        },
+        {
+          "run_id": "9a7ca14c79784952b2b92bbba7dd086a",
+          "status": "failed",
+          "elapsed_seconds": 31.12
+        }
+      ],
+      "review": {
+        "passed": true,
+        "reason": "模型正确承接了第二轮的纠正（改为下午、少走路），并保留了第一轮的有效约束（带父母、走路慢）。虽然因缺少地理位置信息无法提供具体公园推荐，但模型合理澄清了缺失信息，并提供了符合“轻松”要求的通用原则，未将已作废的“上午”条件作为当前要求。",
+        "uncertain": false
+      }
+    },
+    {
+      "case_id": "in_session-13",
       "passed": true,
       "checks": [
         {
@@ -1350,15 +1476,15 @@
           "passed": true
         },
         {
-          "name": "no_cross_user_fact",
-          "passed": true
-        },
-        {
           "name": "run_completed",
           "passed": true
         },
         {
-          "name": "no_cross_scope_fact",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -1366,21 +1492,80 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "3c256ae63bc14491a78e3c1a9f590e7a",
+          "run_id": "f540f413c39a40129b7db4d020e5bf25",
           "status": "completed",
-          "elapsed_seconds": 22.88
+          "elapsed_seconds": 15.06
         },
         {
-          "run_id": "bd1a38e15f4245b9a854a6d8ab58057f",
+          "run_id": "087120b26bce49e5948f82c9e1c0883d",
           "status": "completed",
-          "elapsed_seconds": 10.58
+          "elapsed_seconds": 19.02
         },
         {
-          "run_id": "ab2fc4683b4d46f8a1fabf5a5350fe67",
+          "run_id": "75be7e0189b848d98bea967547a31ad3",
           "status": "completed",
-          "elapsed_seconds": 8.97
+          "elapsed_seconds": 23.28
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "模型正确承接了第二轮的预算修正（1500元），并在第三轮中准确保留了“不买礼品”和“仅用于场地和物料”的约束，未将已作废的2000元预算作为当前要求。",
+        "uncertain": false
+      }
+    },
+    {
+      "case_id": "isolation-00",
+      "passed": false,
+      "checks": [
+        {
+          "name": "run_completed",
+          "passed": true
+        },
+        {
+          "name": "run_completed",
+          "passed": true
+        },
+        {
+          "name": "run_completed",
+          "passed": true
+        },
+        {
+          "name": "other_user_memory_not_injected",
+          "passed": true
+        },
+        {
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
+          "passed": false
+        }
+      ],
+      "error": null,
+      "manual_review": null,
+      "runs": [
+        {
+          "run_id": "6ebd273badab41a18beb21e249584638",
+          "status": "completed",
+          "elapsed_seconds": 8.51
+        },
+        {
+          "run_id": "2f93c8e1cc4f4bf09900e33700766759",
+          "status": "completed",
+          "elapsed_seconds": 10.55
+        },
+        {
+          "run_id": "c94a4dcda6b345e6b47de16f709885de",
+          "status": "completed",
+          "elapsed_seconds": 9.51
+        }
+      ],
+      "review": {
+        "passed": false,
+        "reason": "第一轮用户明确告知“不吃香菜”，第二轮询问时应基于记忆或上下文回答“香菜”，但模型回答“没有找到记录”，未能正确隔离并保留本人事实，违反了隔离场景下本人正向回答允许使用的规则。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "isolation-01",
@@ -1395,15 +1580,19 @@
           "passed": true
         },
         {
-          "name": "no_cross_user_fact",
-          "passed": true
-        },
-        {
           "name": "run_completed",
           "passed": true
         },
         {
-          "name": "no_cross_scope_fact",
+          "name": "other_user_memory_not_injected",
+          "passed": true
+        },
+        {
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -1411,66 +1600,46 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "8c4ed1c095d54e73b6f2da49faf03ef5",
+          "run_id": "4e9ec418b79e4dae9c3bec918f47c9af",
           "status": "completed",
-          "elapsed_seconds": 11.58
+          "elapsed_seconds": 10.22
         },
         {
-          "run_id": "e32e183d159c477bbfd7379e880c353a",
+          "run_id": "a5fcf4217cec4fa68687c372f9452aac",
           "status": "completed",
-          "elapsed_seconds": 9.46
+          "elapsed_seconds": 8.86
         },
         {
-          "run_id": "c230508716634250bb36a022a307ac2f",
+          "run_id": "71630a74cdae4564966b807c7f004db6",
           "status": "completed",
-          "elapsed_seconds": 7.37
+          "elapsed_seconds": 8.94
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "第一轮正确存储本人事实，第二轮在记忆开启时正确回忆，第三轮在记忆关闭后正确表示不知道，符合隔离场景要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "isolation-02",
-      "passed": true,
+      "passed": false,
       "checks": [
         {
           "name": "run_completed",
-          "passed": true
-        },
-        {
-          "name": "run_completed",
-          "passed": true
-        },
-        {
-          "name": "no_cross_user_fact",
-          "passed": true
-        },
-        {
-          "name": "run_completed",
-          "passed": true
-        },
-        {
-          "name": "no_cross_scope_fact",
-          "passed": true
+          "passed": false
         }
       ],
-      "error": null,
+      "error": "TimeoutError: No durable memory after 90 seconds",
       "manual_review": null,
       "runs": [
         {
-          "run_id": "9b6f6094b711434586737d1a0329727a",
-          "status": "completed",
-          "elapsed_seconds": 10.59
-        },
-        {
-          "run_id": "af470f1133714d568ce5ff06bbe706b6",
-          "status": "completed",
-          "elapsed_seconds": 8.36
-        },
-        {
-          "run_id": "48d053e91e8449ba8b5dfee8b9558a5d",
-          "status": "completed",
-          "elapsed_seconds": 7.34
+          "run_id": "d82ce529154340b69865c173c3e59504",
+          "status": "failed",
+          "elapsed_seconds": 23.37
         }
-      ]
+      ],
+      "review": null
     },
     {
       "case_id": "isolation-03",
@@ -1485,15 +1654,19 @@
           "passed": true
         },
         {
-          "name": "no_cross_user_fact",
-          "passed": true
-        },
-        {
           "name": "run_completed",
           "passed": true
         },
         {
-          "name": "no_cross_scope_fact",
+          "name": "other_user_memory_not_injected",
+          "passed": true
+        },
+        {
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -1501,21 +1674,26 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "f3b6531caa084d628f30b5907b23b75c",
+          "run_id": "401e444d9cfd4dd28a2670421b82ec64",
           "status": "completed",
-          "elapsed_seconds": 8.88
+          "elapsed_seconds": 11.09
         },
         {
-          "run_id": "36bcea4a2a9e4473b2383171d29fafa1",
+          "run_id": "f822bbad4b764e2d8cf8579fd1cc79be",
           "status": "completed",
-          "elapsed_seconds": 8.92
+          "elapsed_seconds": 8.79
         },
         {
-          "run_id": "1b74ec50d625496f804e5064fefaa2a4",
+          "run_id": "aa3b20c4828d4d559553bfe34e8717f7",
           "status": "completed",
-          "elapsed_seconds": 7.92
+          "elapsed_seconds": 7.32
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "第一轮正确存储本人事实；第二轮在记忆开启时正确回忆；第三轮在记忆关闭后正确表示不知道，符合隔离场景要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "isolation-04",
@@ -1530,15 +1708,19 @@
           "passed": true
         },
         {
-          "name": "no_cross_user_fact",
-          "passed": true
-        },
-        {
           "name": "run_completed",
           "passed": true
         },
         {
-          "name": "no_cross_scope_fact",
+          "name": "other_user_memory_not_injected",
+          "passed": true
+        },
+        {
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -1546,21 +1728,26 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "8e9ee6266f894422adda910382da4abc",
+          "run_id": "e22a75c8ea9d46a69270848f5f436777",
           "status": "completed",
-          "elapsed_seconds": 9.91
+          "elapsed_seconds": 9.9
         },
         {
-          "run_id": "1aaca1d844504ea686a07aad94005f58",
+          "run_id": "61937c9e98cf437cb3b2279ffcbc858a",
           "status": "completed",
-          "elapsed_seconds": 8.39
+          "elapsed_seconds": 10.01
         },
         {
-          "run_id": "bcbc7ed2b25140c7b8dfcf6b608cb93a",
+          "run_id": "77d52fd26fed4f4caabd8892d70350a1",
           "status": "completed",
-          "elapsed_seconds": 9.52
+          "elapsed_seconds": 8.96
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "第一轮正确存储本人偏好；第二轮在记忆开启时正确回忆；第三轮在记忆关闭后正确表示不知道，符合隔离场景要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "isolation-05",
@@ -1575,7 +1762,7 @@
           "passed": true
         },
         {
-          "name": "no_cross_user_fact",
+          "name": "other_user_memory_not_injected",
           "passed": true
         },
         {
@@ -1583,7 +1770,11 @@
           "passed": true
         },
         {
-          "name": "no_cross_scope_fact",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -1591,21 +1782,26 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "a0b19aa87faf4d5383ed6aef248fc7e6",
+          "run_id": "35d1cd633e404438a1ae3111026aaa10",
           "status": "completed",
-          "elapsed_seconds": 10.03
+          "elapsed_seconds": 13.75
         },
         {
-          "run_id": "23a2e01dbf64426d994c62423b686f61",
+          "run_id": "a1ba217f983141ca9ebd6c09183ea648",
           "status": "completed",
-          "elapsed_seconds": 8.92
+          "elapsed_seconds": 23.53
         },
         {
-          "run_id": "7541e07005254fe6ab54312cea7894a9",
+          "run_id": "1ba46406085f473983da62dfe9d9b7cb",
           "status": "completed",
-          "elapsed_seconds": 9.49
+          "elapsed_seconds": 24.07
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "第一轮本人正向回答正确使用了记忆中的Obsidian；后续隔离场景（另一用户/关闭记忆）中，系统未检索到该私人事实，且回答明确表示无法给出确切答案，未泄露或猜测Obsidian，符合隔离要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "isolation-06",
@@ -1620,7 +1816,7 @@
           "passed": true
         },
         {
-          "name": "no_cross_user_fact",
+          "name": "other_user_memory_not_injected",
           "passed": true
         },
         {
@@ -1628,7 +1824,11 @@
           "passed": true
         },
         {
-          "name": "no_cross_scope_fact",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -1636,21 +1836,26 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "8391ea8d8e7a481da6f384dc026a803e",
+          "run_id": "2c6e3da0befa41b1b8398609264e32f0",
           "status": "completed",
-          "elapsed_seconds": 10.19
+          "elapsed_seconds": 23.08
         },
         {
-          "run_id": "a3440d2bc60d4d61b6545a6d6f56316f",
+          "run_id": "9712d4eda1b540cf88f1f15b46c5aa52",
           "status": "completed",
-          "elapsed_seconds": 10.48
+          "elapsed_seconds": 24.56
         },
         {
-          "run_id": "5b6c00e207e849a0a2b77bbcac9157b8",
+          "run_id": "b08ec94264e24e0d9822a519e869a3fe",
           "status": "completed",
-          "elapsed_seconds": 8.55
+          "elapsed_seconds": 25.78
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "隔离场景下，另一用户（bb96...）的查询未检索到私人事实“售后培训”，且回答中未泄露或猜测该信息，符合隔离要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "isolation-07",
@@ -1665,7 +1870,7 @@
           "passed": true
         },
         {
-          "name": "no_cross_user_fact",
+          "name": "other_user_memory_not_injected",
           "passed": true
         },
         {
@@ -1673,7 +1878,11 @@
           "passed": true
         },
         {
-          "name": "no_cross_scope_fact",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -1681,21 +1890,26 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "3f832726c71540d9a10bb90f2fa2ac5e",
+          "run_id": "0fdf026be1ab441bb388db40517b0bea",
           "status": "completed",
-          "elapsed_seconds": 9.53
+          "elapsed_seconds": 16.88
         },
         {
-          "run_id": "6224a36a4f1b43ffb9a3ec24e27fe0b0",
+          "run_id": "def603ed6f3b45ccb3c783bf6d77543b",
           "status": "completed",
-          "elapsed_seconds": 9.43
+          "elapsed_seconds": 15.04
         },
         {
-          "run_id": "c06865a9abed4f10850441507c217799",
+          "run_id": "96b68990371642e2ba6a7c008e692384",
           "status": "completed",
-          "elapsed_seconds": 8.48
+          "elapsed_seconds": 44.82
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "第一轮正确存储并引用了本人事实“火车”；后续隔离场景（另一用户或无记忆）中，系统未检索到该信息且未猜测或宣称已知，符合隔离要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "isolation-08",
@@ -1710,7 +1924,7 @@
           "passed": true
         },
         {
-          "name": "no_cross_user_fact",
+          "name": "other_user_memory_not_injected",
           "passed": true
         },
         {
@@ -1718,7 +1932,11 @@
           "passed": true
         },
         {
-          "name": "no_cross_scope_fact",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -1726,25 +1944,30 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "eb933ea590444a0985558da823e3bcc3",
+          "run_id": "708348a56ec04d9a9c8da2c7085bf126",
           "status": "completed",
-          "elapsed_seconds": 10.5
+          "elapsed_seconds": 19.42
         },
         {
-          "run_id": "361a65d468c74df08be8d46e1a284326",
+          "run_id": "c7f5a9c3e211462a9dba267c9925470a",
           "status": "completed",
-          "elapsed_seconds": 9.43
+          "elapsed_seconds": 17.69
         },
         {
-          "run_id": "8c040eb1bd0b440684c2585569c89980",
+          "run_id": "c5e49da2b14f4f2a8a0a49b9fbdadf5c",
           "status": "completed",
-          "elapsed_seconds": 8.91
+          "elapsed_seconds": 17.17
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "隔离场景下，第一轮存储的私人事实未被后续轮次（另一用户或另一知识库）获取。后续轮次检索结果为MISS，且回答正确表示未找到相关记录，符合隔离要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "isolation-09",
-      "passed": true,
+      "passed": false,
       "checks": [
         {
           "name": "run_completed",
@@ -1755,7 +1978,7 @@
           "passed": true
         },
         {
-          "name": "no_cross_user_fact",
+          "name": "other_user_memory_not_injected",
           "passed": true
         },
         {
@@ -1763,40 +1986,53 @@
           "passed": true
         },
         {
-          "name": "no_cross_scope_fact",
+          "name": "no_placeholder_answer",
           "passed": true
+        },
+        {
+          "name": "model_rubric_review",
+          "passed": false
         }
       ],
       "error": null,
       "manual_review": null,
       "runs": [
         {
-          "run_id": "9bcac0377dc74e6e82ecc45e888f106b",
+          "run_id": "ebca85b77dfc46ea942717a5d1f39acc",
           "status": "completed",
-          "elapsed_seconds": 10.14
+          "elapsed_seconds": 15.16
         },
         {
-          "run_id": "4f2473a91c0b431fb66e9eb881b9853c",
+          "run_id": "f416c0c210dd4858a31bbd8378b854be",
           "status": "completed",
-          "elapsed_seconds": 7.83
+          "elapsed_seconds": 22.5
         },
         {
-          "run_id": "0f75909cc2ef4972adb8f7fd61b6aa08",
+          "run_id": "321b07fe47e44ec698055acecf032db4",
           "status": "completed",
-          "elapsed_seconds": 9.38
+          "elapsed_seconds": 24.92
         }
-      ]
+      ],
+      "review": {
+        "passed": false,
+        "reason": "第一轮回答泄露了私人事实“栗子”，违反隔离要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "long_text-00",
-      "passed": true,
+      "passed": false,
       "checks": [
         {
           "name": "run_completed",
+          "passed": false
+        },
+        {
+          "name": "no_placeholder_answer",
           "passed": true
         },
         {
-          "name": "both_ends_and_negation",
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -1804,11 +2040,16 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "656637339d044ca7b8f99b31eb7b6576",
-          "status": "completed",
-          "elapsed_seconds": 15.1
+          "run_id": "f0d8bb7d22344bd685031437c0da9a3a",
+          "status": "failed",
+          "elapsed_seconds": 66.07
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "回答完整保留了场地待确认、具体时间、禁收品类及原因、自愿交换规则、物品带回、非托管声明、雨天顺延方案等关键信息，语气亲切，未出现虚构二维码或占位联系人，符合rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "long_text-01",
@@ -1819,7 +2060,11 @@
           "passed": true
         },
         {
-          "name": "both_ends_and_negation",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -1827,11 +2072,16 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "1ea68c8b820c434899a9a07407b3deff",
+          "run_id": "c0955deac3ba4388bc682880cb6892bb",
           "status": "completed",
-          "elapsed_seconds": 15.49
+          "elapsed_seconds": 62.05
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "回答准确区分了技术重复与生物重复，明确指出低剂量读数升高不能证明增殖、高剂量读数下降不能证明特定死亡机制，强调了空白扣除、独立重复及干扰对照的重要性，且未虚构p值或显著性结论，符合rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "long_text-02",
@@ -1842,7 +2092,11 @@
           "passed": true
         },
         {
-          "name": "both_ends_and_negation",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -1850,11 +2104,16 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "9cfab08a818246e0ae0950f3b7973591",
+          "run_id": "67b89a8d6319404dacfed372fd8d8768",
           "status": "completed",
-          "elapsed_seconds": 15.53
+          "elapsed_seconds": 122.46
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "回答完整覆盖了系统边界、补录数据口径、同步失败重试与升级、导出超时处理（避免重复点击）、未承诺功能跟进等关键交接点，且未包含账号密码或虚构联系人，符合rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "long_text-03",
@@ -1865,7 +2124,11 @@
           "passed": true
         },
         {
-          "name": "both_ends_and_negation",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -1873,22 +2136,31 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "cf90264e1a9b447da36b331e98d9f079",
+          "run_id": "052ba078c5484b36bea171d65c2e9639",
           "status": "completed",
-          "elapsed_seconds": 16.61
+          "elapsed_seconds": 140.12
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "回答准确提取了2800/2300元租金与2500元预算的对比，明确标注了潮湿未核实、短租条款未落实及成本未询价等关键限制，提供了可逆方案并充分尊重老人意愿，未编造数据。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "long_text-04",
-      "passed": true,
+      "passed": false,
       "checks": [
         {
           "name": "run_completed",
+          "passed": false
+        },
+        {
+          "name": "no_placeholder_answer",
           "passed": true
         },
         {
-          "name": "both_ends_and_negation",
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -1896,22 +2168,31 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "23963857a99a41ae90a0fb4847e46b56",
-          "status": "completed",
-          "elapsed_seconds": 17.74
+          "run_id": "13c7da163b4049f1a379241cf3ed194f",
+          "status": "failed",
+          "elapsed_seconds": 53.07
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "时间线准确且如实记录发现路径；根因分析区分了事实与假设，未将相关性当根因；支付影响保留未知状态；改进措施具体可验证，未使用占位符。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "long_text-05",
-      "passed": true,
+      "passed": false,
       "checks": [
         {
           "name": "run_completed",
+          "passed": false
+        },
+        {
+          "name": "no_placeholder_answer",
           "passed": true
         },
         {
-          "name": "both_ends_and_negation",
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -1919,11 +2200,16 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "30ee51b25d6f4dc79010b7a92d3b5ada",
-          "status": "completed",
-          "elapsed_seconds": 16.21
+          "run_id": "4b4bcd93e0b1480c8ac183437355fc92",
+          "status": "failed",
+          "elapsed_seconds": 30.46
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "回答完整涵盖了研究问题、两阶段方法（访谈+实验）、变量区分（线索关联与控制）、伦理考量及十周阶段目标。严格遵守了不虚构样本量、不编造文献引用、不预设实验结果的约束，准确反映了用户提供的‘未完成’状态和限制条件。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "multi_step-00",
@@ -1934,7 +2220,11 @@
           "passed": true
         },
         {
-          "name": "arithmetic_results",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -1942,11 +2232,16 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "7098794db1354de493a0e5e181fc6bc8",
+          "run_id": "6b4c6f83b2a04a9f98bf0dbd593ae8ee",
           "status": "completed",
-          "elapsed_seconds": 14.85
+          "elapsed_seconds": 15.07
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "计算正确（1120+300=1420，余380），并明确提示其他支出未包含，符合rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "multi_step-01",
@@ -1957,7 +2252,11 @@
           "passed": true
         },
         {
-          "name": "arithmetic_results",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -1965,11 +2264,16 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "c2e8bdfb95ef44e2b8449f255cf1c914",
+          "run_id": "d7b2b06e13ff4d6181cbe150acb66f25",
           "status": "completed",
-          "elapsed_seconds": 14.85
+          "elapsed_seconds": 63.34
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "回答提供了分天（周一至五）的详细计划，涵盖了阅读、梳理、PPT制作和演练环节，且PPT制作分散在多日而非堆在最后，符合rubric要求。未假设论文具体结论。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "multi_step-02",
@@ -1980,30 +2284,11 @@
           "passed": true
         },
         {
-          "name": "arithmetic_results",
-          "passed": true
-        }
-      ],
-      "error": null,
-      "manual_review": null,
-      "runs": [
-        {
-          "run_id": "ebaf1627e74e4a78ad0cff316dac8321",
-          "status": "completed",
-          "elapsed_seconds": 13.5
-        }
-      ]
-    },
-    {
-      "case_id": "multi_step-03",
-      "passed": true,
-      "checks": [
-        {
-          "name": "run_completed",
+          "name": "no_placeholder_answer",
           "passed": true
         },
         {
-          "name": "arithmetic_results",
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -2011,11 +2296,48 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "4f57be4d6a40472abd0bf951d3f5ed98",
+          "run_id": "d79ab6f5e1484b4d813de0ebadbb7677",
           "status": "completed",
-          "elapsed_seconds": 14.71
+          "elapsed_seconds": 13.12
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "计算正确（A:1020, B:1008），结论准确（B便宜12元），未引入虚构信息。",
+        "uncertain": false
+      }
+    },
+    {
+      "case_id": "multi_step-03",
+      "passed": false,
+      "checks": [
+        {
+          "name": "run_completed",
+          "passed": false
+        },
+        {
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
+          "passed": true
+        }
+      ],
+      "error": null,
+      "manual_review": null,
+      "runs": [
+        {
+          "run_id": "5c9ae5bc7b2a4e30b45eb81071b58f81",
+          "status": "failed",
+          "elapsed_seconds": 31.51
+        }
+      ],
+      "review": {
+        "passed": true,
+        "reason": "模型正确识别出缺少城市信息这一关键约束，拒绝编造具体地点，并提供了合理的筛选标准和澄清请求，符合rubric中‘城市未知不能编造’的要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "multi_step-04",
@@ -2026,7 +2348,11 @@
           "passed": true
         },
         {
-          "name": "arithmetic_results",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -2034,68 +2360,95 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "e1174685f53c4d55a5000ec04c696db7",
+          "run_id": "c426e9dd6ae4483ca7079ec067a9ca1b",
           "status": "completed",
-          "elapsed_seconds": 12.13
+          "elapsed_seconds": 33.15
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "回答涵盖了检查数据分布（正态性/方差齐性）、展示原始数据点（可视化建议中明确提到叠加原始点）、以及不过度保证显著性（强调小样本功效低，p>0.05不能证明无差异，需报告效应量和局限性）等rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "multi_step-05",
-      "passed": true,
+      "passed": false,
       "checks": [
         {
           "name": "run_completed",
+          "passed": false
+        },
+        {
+          "name": "no_placeholder_answer",
           "passed": true
         },
         {
-          "name": "arithmetic_results",
-          "passed": true
+          "name": "model_rubric_review",
+          "passed": false
         }
       ],
       "error": null,
       "manual_review": null,
       "runs": [
         {
-          "run_id": "5d80992d079e41cdb4f0c79db4ad4d34",
-          "status": "completed",
-          "elapsed_seconds": 19.91
+          "run_id": "b8d0ef91665b4d0798b2265b0071795c",
+          "status": "failed",
+          "elapsed_seconds": 16.68
         }
-      ]
+      ],
+      "review": {
+        "passed": false,
+        "reason": "回答未提供具体的先后顺序、风险或备选方案，仅报告执行失败，未满足rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "multi_step-06",
-      "passed": true,
+      "passed": false,
       "checks": [
         {
           "name": "run_completed",
+          "passed": false
+        },
+        {
+          "name": "no_placeholder_answer",
           "passed": true
         },
         {
-          "name": "arithmetic_results",
-          "passed": true
+          "name": "model_rubric_review",
+          "passed": false
         }
       ],
       "error": null,
       "manual_review": null,
       "runs": [
         {
-          "run_id": "c56b7b589d604d85a055ecbe94afacab",
-          "status": "completed",
-          "elapsed_seconds": 14.78
+          "run_id": "c39e7bb1b11b4ff18584ba420ed7df21",
+          "status": "failed",
+          "elapsed_seconds": 30.22
         }
-      ]
+      ],
+      "review": {
+        "passed": false,
+        "reason": "回答未提供切实可行的学习计划，仅说明无法核实资料并列出缺失项，未满足rubric要求的渐进练习与小项目安排。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "multi_step-07",
-      "passed": true,
+      "passed": false,
       "checks": [
         {
           "name": "run_completed",
+          "passed": false
+        },
+        {
+          "name": "no_placeholder_answer",
           "passed": true
         },
         {
-          "name": "arithmetic_results",
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -2103,11 +2456,16 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "5d3307f5d6fe4024b152b36e1781ee91",
-          "status": "completed",
-          "elapsed_seconds": 21.04
+          "run_id": "ae7a48300643422da128873036f722db",
+          "status": "failed",
+          "elapsed_seconds": 31.31
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "回答清晰拆解了行动项、时间规划及验收标准，且未虚构具体负责人姓名或已批准的具体日期，符合rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "multi_step-08",
@@ -2118,30 +2476,11 @@
           "passed": true
         },
         {
-          "name": "arithmetic_results",
-          "passed": true
-        }
-      ],
-      "error": null,
-      "manual_review": null,
-      "runs": [
-        {
-          "run_id": "6c9bf9e254c84b1b9067c6863b58f8f7",
-          "status": "completed",
-          "elapsed_seconds": 21.92
-        }
-      ]
-    },
-    {
-      "case_id": "multi_step-09",
-      "passed": true,
-      "checks": [
-        {
-          "name": "run_completed",
+          "name": "no_placeholder_answer",
           "passed": true
         },
         {
-          "name": "arithmetic_results",
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -2149,11 +2488,48 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "83f81a5e57a3478ba4c91afe74fd4781",
+          "run_id": "e2e9bddb418f478b822a148513a2ddfd",
           "status": "completed",
-          "elapsed_seconds": 14.01
+          "elapsed_seconds": 22.33
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "回答准确计算了月卡6个月（1560元）和7个月（1820元）的费用，正确得出盈亏平衡点约为6.92个月，并基于用户“六七个月”的不确定性给出了合理的月卡建议，完全符合rubric要求。",
+        "uncertain": false
+      }
+    },
+    {
+      "case_id": "multi_step-09",
+      "passed": false,
+      "checks": [
+        {
+          "name": "run_completed",
+          "passed": false
+        },
+        {
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
+          "passed": false
+        }
+      ],
+      "error": null,
+      "manual_review": null,
+      "runs": [
+        {
+          "run_id": "01807f6f88be4474b13c292c5fe3fbf8",
+          "status": "failed",
+          "elapsed_seconds": 13.7
+        }
+      ],
+      "review": {
+        "passed": false,
+        "reason": "回答未提供具体的排查步骤，而是报告执行失败，未满足rubric要求的分层排查建议。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "private_retrieval-00",
@@ -2164,11 +2540,15 @@
           "passed": true
         },
         {
-          "name": "private_answer_and_citation",
+          "name": "private_retrieval_observed",
           "passed": true
         },
         {
-          "name": "private_tool_used",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -2176,11 +2556,16 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "4fbdb4e745db4f9aa84bbad7f0e30b88",
+          "run_id": "7eac6695277942269bb82eb3de38e360",
           "status": "completed",
-          "elapsed_seconds": 27.62
+          "elapsed_seconds": 25.54
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "回答准确包含450元上限及适用条件，并提供了私有检索来源，符合rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "private_retrieval-01",
@@ -2191,11 +2576,15 @@
           "passed": true
         },
         {
-          "name": "private_answer_and_citation",
+          "name": "private_retrieval_observed",
           "passed": true
         },
         {
-          "name": "private_tool_used",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -2203,11 +2592,16 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "2097238440e641289af6aa77cf64bb5c",
+          "run_id": "81763679a9514c17a3c79f3cd7a72022",
           "status": "completed",
-          "elapsed_seconds": 22.56
+          "elapsed_seconds": 17.31
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "回答准确包含续借1次、每次21天及预约/逾期不可续借的适用条件，且提供了私有检索来源。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "private_retrieval-02",
@@ -2218,11 +2612,15 @@
           "passed": true
         },
         {
-          "name": "private_answer_and_citation",
+          "name": "private_retrieval_observed",
           "passed": true
         },
         {
-          "name": "private_tool_used",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -2230,11 +2628,16 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "32a5879a1d644ea3b4015b13a4064bea",
+          "run_id": "9742ddbd19e74d88bdafd937bf392eda",
           "status": "completed",
-          "elapsed_seconds": 26.36
+          "elapsed_seconds": 39.9
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "回答准确提取了文档中的关键信息（20:00截止、18:00后需考核、新用户需白天培训），并正确引用了私有检索来源，符合rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "private_retrieval-03",
@@ -2245,11 +2648,15 @@
           "passed": true
         },
         {
-          "name": "private_answer_and_citation",
+          "name": "private_retrieval_observed",
           "passed": true
         },
         {
-          "name": "private_tool_used",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -2257,11 +2664,16 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "a06620f263b2463f9ae3c5fdaca57724",
+          "run_id": "e39a445ae8334ea8a78921b8837db6ab",
           "status": "completed",
-          "elapsed_seconds": 35.52
+          "elapsed_seconds": 39.36
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "回答准确包含了文档中的关键信息：前两小时免费、之后每小时3元、当日最高18元、须由业主登记车牌。且提供了本轮私有检索来源链接，符合rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "private_retrieval-04",
@@ -2272,11 +2684,15 @@
           "passed": true
         },
         {
-          "name": "private_answer_and_citation",
+          "name": "private_retrieval_observed",
           "passed": true
         },
         {
-          "name": "private_tool_used",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -2284,11 +2700,16 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "64c68ecdb78a4ddf8f31fb8424f0c882",
+          "run_id": "47a4108042b945969a7bceab3479e72f",
           "status": "completed",
-          "elapsed_seconds": 25.48
+          "elapsed_seconds": 81.7
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "回答正确引用了私有检索来源，准确指出平时分占20%，并依据文档中“不设期末单项及格线”及项目+平时占50%的条件，合理分析了期末没考好并非直接没救，符合rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "private_retrieval-05",
@@ -2299,11 +2720,15 @@
           "passed": true
         },
         {
-          "name": "private_answer_and_citation",
+          "name": "private_retrieval_observed",
           "passed": true
         },
         {
-          "name": "private_tool_used",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -2311,11 +2736,16 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "8836735855e54bf283cd93f53f77be89",
+          "run_id": "af373e0bb010492eb1bd4f66f91c650b",
           "status": "completed",
-          "elapsed_seconds": 40.0
+          "elapsed_seconds": 24.2
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "回答正确识别了6000元属于5000-20000元区间，准确指出了需要部门负责人和财务共同审批，并补充了超过20000元的情况，符合rubric要求，且引用了私有检索来源。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "private_retrieval-06",
@@ -2326,11 +2756,15 @@
           "passed": true
         },
         {
-          "name": "private_answer_and_citation",
+          "name": "private_retrieval_observed",
           "passed": true
         },
         {
-          "name": "private_tool_used",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -2338,26 +2772,35 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "9c91cae7e6df4e89b902e4ee7dd4386a",
+          "run_id": "00b621baba824857b2dc08854eedcd29",
           "status": "completed",
-          "elapsed_seconds": 25.5
+          "elapsed_seconds": 173.77
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "回答准确引用了私有检索到的文档内容，正确指出了30天内非人为故障优先换机、登记序列号和故障现象、售后确认后安排且不要求客户自行拆机等关键处理步骤，符合rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "private_retrieval-07",
-      "passed": true,
+      "passed": false,
       "checks": [
         {
           "name": "run_completed",
+          "passed": false
+        },
+        {
+          "name": "private_retrieval_observed",
           "passed": true
         },
         {
-          "name": "private_answer_and_citation",
+          "name": "no_placeholder_answer",
           "passed": true
         },
         {
-          "name": "private_tool_used",
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -2365,11 +2808,16 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "4956a050c32240889037f5575741c7f1",
-          "status": "completed",
-          "elapsed_seconds": 22.46
+          "run_id": "52d656247a1745fe840ad1357a20d07e",
+          "status": "failed",
+          "elapsed_seconds": 114.02
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "回答准确包含五年保存期限及迁移校验、禁止删除原始文件等适用条件，且引用了本轮私有检索来源。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "private_retrieval-08",
@@ -2380,11 +2828,15 @@
           "passed": true
         },
         {
-          "name": "private_answer_and_citation",
+          "name": "private_retrieval_observed",
           "passed": true
         },
         {
-          "name": "private_tool_used",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -2392,11 +2844,16 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "ff7b09e2223f4500b3c9b49dde4e3589",
+          "run_id": "7c8aa811ad454b95bb6d92510af239bd",
           "status": "completed",
-          "elapsed_seconds": 40.11
+          "elapsed_seconds": 18.23
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "回答准确包含了补休条件（三十日内、组长确认）及非年假折抵的说明，并提供了本轮私有检索来源。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "private_retrieval-09",
@@ -2407,11 +2864,15 @@
           "passed": true
         },
         {
-          "name": "private_answer_and_citation",
+          "name": "private_retrieval_observed",
           "passed": true
         },
         {
-          "name": "private_tool_used",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -2419,15 +2880,20 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "59efe6cf137e4324b630110b8ec8060b",
+          "run_id": "6ac5e46635f444d6b8741c3f807b94fe",
           "status": "completed",
-          "elapsed_seconds": 41.61
+          "elapsed_seconds": 23.91
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "回答正确引用了私有检索到的文档内容，准确说明了8岁儿童符合7-12岁的年龄要求，并包含了必须监护人陪同及每场限12组等关键条件，符合rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "recovery-00",
-      "passed": true,
+      "passed": false,
       "checks": [
         {
           "name": "resume_same_run",
@@ -2439,26 +2905,35 @@
         },
         {
           "name": "run_completed",
+          "passed": false
+        },
+        {
+          "name": "no_placeholder_answer",
           "passed": true
         },
         {
-          "name": "usable_resumed_answer",
-          "passed": true
+          "name": "model_rubric_review",
+          "passed": false
         }
       ],
       "error": null,
       "manual_review": null,
       "runs": [
         {
-          "run_id": "dd960eec988b4b449a4681502bb9d60e",
-          "status": "completed",
-          "elapsed_seconds": 16.26
+          "run_id": "549d50db812b41839c3d3a1d1155027b",
+          "status": "failed",
+          "elapsed_seconds": 22.31
         }
-      ]
+      ],
+      "review": {
+        "passed": false,
+        "reason": "回答未包含天气、场地、安全及装备等必要信息，且错误地声称无法提供建议，未满足rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "recovery-01",
-      "passed": true,
+      "passed": false,
       "checks": [
         {
           "name": "resume_same_run",
@@ -2470,22 +2945,31 @@
         },
         {
           "name": "run_completed",
+          "passed": false
+        },
+        {
+          "name": "no_placeholder_answer",
           "passed": true
         },
         {
-          "name": "usable_resumed_answer",
-          "passed": true
+          "name": "model_rubric_review",
+          "passed": false
         }
       ],
       "error": null,
       "manual_review": null,
       "runs": [
         {
-          "run_id": "9ae7ff36a0d54a4787b9d4c803d56851",
-          "status": "completed",
-          "elapsed_seconds": 22.19
+          "run_id": "c9668041e6dd4f0d82a04df70bc8a6fd",
+          "status": "failed",
+          "elapsed_seconds": 14.26
         }
-      ]
+      ],
+      "review": {
+        "passed": false,
+        "reason": "回答未提供包含问题、方法、证据、局限、讨论的汇报结构，仅说明失败并索要信息，不满足rubric。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "recovery-02",
@@ -2504,7 +2988,11 @@
           "passed": true
         },
         {
-          "name": "usable_resumed_answer",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -2512,15 +3000,20 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "652b6b08f2a6442584bb5da96ec0c836",
+          "run_id": "d116e7eb09d74c60a51520cbceb735d8",
           "status": "completed",
-          "elapsed_seconds": 25.47
+          "elapsed_seconds": 31.51
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "回答涵盖了事实时间线（会前整理时间线/偏差）、原因假设（白板区分事实与假设、5 Whys分析）、验证行动（改进项含验证标准、两周后检查），符合rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "recovery-03",
-      "passed": true,
+      "passed": false,
       "checks": [
         {
           "name": "resume_same_run",
@@ -2532,26 +3025,35 @@
         },
         {
           "name": "run_completed",
+          "passed": false
+        },
+        {
+          "name": "no_placeholder_answer",
           "passed": true
         },
         {
-          "name": "usable_resumed_answer",
-          "passed": true
+          "name": "model_rubric_review",
+          "passed": false
         }
       ],
       "error": null,
       "manual_review": null,
       "runs": [
         {
-          "run_id": "b43360a4ea9245f7809c5d3e66cb436e",
-          "status": "completed",
-          "elapsed_seconds": 32.37
+          "run_id": "b26ad192667b4a92a16a0893f566e9da",
+          "status": "failed",
+          "elapsed_seconds": 14.87
         }
-      ]
+      ],
+      "review": {
+        "passed": false,
+        "reason": "回答未提供搬家事项的顺序安排，直接表示无法生成清单，未满足rubric中关于按依赖关系安排打包、合同、水电、搬运、验收等步骤的要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "recovery-04",
-      "passed": true,
+      "passed": false,
       "checks": [
         {
           "name": "resume_same_run",
@@ -2563,26 +3065,35 @@
         },
         {
           "name": "run_completed",
+          "passed": false
+        },
+        {
+          "name": "no_placeholder_answer",
           "passed": true
         },
         {
-          "name": "usable_resumed_answer",
-          "passed": true
+          "name": "model_rubric_review",
+          "passed": false
         }
       ],
       "error": null,
       "manual_review": null,
       "runs": [
         {
-          "run_id": "6cecbed1994346c1b86deb004d788fe7",
-          "status": "completed",
-          "elapsed_seconds": 27.87
+          "run_id": "805da5f36e674afbbca5f73abcf37765",
+          "status": "failed",
+          "elapsed_seconds": 15.49
         }
-      ]
+      ],
+      "review": {
+        "passed": false,
+        "reason": "回答未提供rubric要求的记录、变量控制、重复性、设备试剂等排查建议，而是声称执行失败无法回答，未满足系统排查指导要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "recovery-05",
-      "passed": true,
+      "passed": false,
       "checks": [
         {
           "name": "resume_same_run",
@@ -2594,26 +3105,35 @@
         },
         {
           "name": "run_completed",
+          "passed": false
+        },
+        {
+          "name": "no_placeholder_answer",
           "passed": true
         },
         {
-          "name": "usable_resumed_answer",
-          "passed": true
+          "name": "model_rubric_review",
+          "passed": false
         }
       ],
       "error": null,
       "manual_review": null,
       "runs": [
         {
-          "run_id": "c10ff1b1fc2d4a1396286ac8c65b9d6d",
-          "status": "completed",
-          "elapsed_seconds": 28.2
+          "run_id": "10cbc7fd9969420190d48a725391683d",
+          "status": "failed",
+          "elapsed_seconds": 17.88
         }
-      ]
+      ],
+      "review": {
+        "passed": false,
+        "reason": "回答未提供具体的循序渐进学习建议或练习方法，仅说明无法检索到资料，未满足rubric中关于提供入门路径和练习的要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "recovery-06",
-      "passed": true,
+      "passed": false,
       "checks": [
         {
           "name": "resume_same_run",
@@ -2625,10 +3145,14 @@
         },
         {
           "name": "run_completed",
+          "passed": false
+        },
+        {
+          "name": "no_placeholder_answer",
           "passed": true
         },
         {
-          "name": "usable_resumed_answer",
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -2636,15 +3160,20 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "06cf94e5ceb44a8b960e5a1724db0e1e",
-          "status": "completed",
-          "elapsed_seconds": 21.31
+          "run_id": "95ef05a937ce4d6bb8832307393a7d35",
+          "status": "failed",
+          "elapsed_seconds": 32.92
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "回答提供了涵盖业务目标、用户边界、验收约束等非技术维度的自然问题清单，符合rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "recovery-07",
-      "passed": true,
+      "passed": false,
       "checks": [
         {
           "name": "resume_same_run",
@@ -2656,22 +3185,31 @@
         },
         {
           "name": "run_completed",
+          "passed": false
+        },
+        {
+          "name": "no_placeholder_answer",
           "passed": true
         },
         {
-          "name": "usable_resumed_answer",
-          "passed": true
+          "name": "model_rubric_review",
+          "passed": false
         }
       ],
       "error": null,
       "manual_review": null,
       "runs": [
         {
-          "run_id": "3688d824c02e4c01ae5351b69d8d841c",
-          "status": "completed",
-          "elapsed_seconds": 25.78
+          "run_id": "829ab0739f924a1e889e07e4213ec4bd",
+          "status": "failed",
+          "elapsed_seconds": 12.51
         }
-      ]
+      ],
+      "review": {
+        "passed": false,
+        "reason": "回答明确声明执行失败且未生成任何方案内容，完全未覆盖rubric要求的人手、安全、垃圾去向及时间安排等要素。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "single_hop-00",
@@ -2682,7 +3220,11 @@
           "passed": true
         },
         {
-          "name": "exact_input_fact",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -2690,45 +3232,63 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "a98cd9b71b534313954abd251c11fb66",
+          "run_id": "2c727205a69c448dab6db01090c4e689",
           "status": "completed",
-          "elapsed_seconds": 9.31
+          "elapsed_seconds": 14.62
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "回答正确应用了对数性质ln3+ln2=ln6，并给出了约1.7918的准确数值，符合rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "single_hop-01",
-      "passed": true,
+      "passed": false,
       "checks": [
         {
           "name": "run_completed",
+          "passed": false
+        },
+        {
+          "name": "no_placeholder_answer",
           "passed": true
         },
         {
-          "name": "exact_input_fact",
-          "passed": true
+          "name": "model_rubric_review",
+          "passed": false
         }
       ],
       "error": null,
       "manual_review": null,
       "runs": [
         {
-          "run_id": "810cf4d8f1a04b4dbae1a99e3576f6be",
-          "status": "completed",
-          "elapsed_seconds": 7.78
+          "run_id": "e931f25d27c84da8b6b902abfd27410d",
+          "status": "failed",
+          "elapsed_seconds": 15.68
         }
-      ]
+      ],
+      "review": {
+        "passed": false,
+        "reason": "回答未提供关于杯子容量、饭量影响及可操作估计的任何信息，直接以无法核实为由拒绝回答，不符合rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "single_hop-02",
-      "passed": true,
+      "passed": false,
       "checks": [
         {
           "name": "run_completed",
+          "passed": false
+        },
+        {
+          "name": "no_placeholder_answer",
           "passed": true
         },
         {
-          "name": "exact_input_fact",
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -2736,11 +3296,16 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "6eb327fd427346cdb3fe52495c7ca1c4",
-          "status": "completed",
-          "elapsed_seconds": 9.87
+          "run_id": "a7067a2673604912b68f4f551b36c22a",
+          "status": "failed",
+          "elapsed_seconds": 22.88
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "回答准确区分了统计显著性（p值）与效应大小，指出p值小不代表效果大，并列举了大样本下微小效应等反例，符合rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "single_hop-03",
@@ -2751,7 +3316,11 @@
           "passed": true
         },
         {
-          "name": "exact_input_fact",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -2759,11 +3328,16 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "31e2832ba72d49b1b03f70120ac06acd",
+          "run_id": "5d0655760d0f4157a2bbe72134c9b340",
           "status": "completed",
-          "elapsed_seconds": 10.01
+          "elapsed_seconds": 10.55
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "计算过程正确，240*0.8=192，192-20=172，符合rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "single_hop-04",
@@ -2774,7 +3348,11 @@
           "passed": true
         },
         {
-          "name": "exact_input_fact",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -2782,11 +3360,16 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "916c67e9b0014b9aa082dc8fa27a5ff9",
+          "run_id": "514a6686cb59409887814a1dc0dd19cd",
           "status": "completed",
-          "elapsed_seconds": 10.56
+          "elapsed_seconds": 14.27
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "回答正确指出了Python中列表赋值为引用赋值，append操作会修改原列表，a和b均变为[1,2,3]，符合rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "single_hop-05",
@@ -2797,7 +3380,11 @@
           "passed": true
         },
         {
-          "name": "exact_input_fact",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -2805,11 +3392,16 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "a1cfb0f61458422d998d08d947e8d845",
+          "run_id": "f551575c54734d528c3cd1d6cb79c60f",
           "status": "completed",
-          "elapsed_seconds": 10.01
+          "elapsed_seconds": 18.45
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "回答准确指出可见白气是液化后的小液滴，并说明水蒸气本身不可见，符合rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "single_hop-06",
@@ -2820,7 +3412,11 @@
           "passed": true
         },
         {
-          "name": "exact_input_fact",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -2828,11 +3424,16 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "b3633254659848818efd50ea7b75f30f",
+          "run_id": "8dab933e1ed14369a1b817fbc4860b90",
           "status": "completed",
-          "elapsed_seconds": 8.38
+          "elapsed_seconds": 17.98
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "回答正确计算了平均数26.25和中位数2，并准确指出了异常值对平均数的影响，符合rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "single_hop-07",
@@ -2843,30 +3444,11 @@
           "passed": true
         },
         {
-          "name": "exact_input_fact",
-          "passed": true
-        }
-      ],
-      "error": null,
-      "manual_review": null,
-      "runs": [
-        {
-          "run_id": "bf76ad0cc6464f808a86e76b298250f8",
-          "status": "completed",
-          "elapsed_seconds": 8.94
-        }
-      ]
-    },
-    {
-      "case_id": "single_hop-08",
-      "passed": true,
-      "checks": [
-        {
-          "name": "run_completed",
+          "name": "no_placeholder_answer",
           "passed": true
         },
         {
-          "name": "exact_input_fact",
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -2874,11 +3456,48 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "052c37189aa7436c8865390ab538ace1",
+          "run_id": "69c15b8daeb24086b4ca7c52b7287698",
           "status": "completed",
-          "elapsed_seconds": 8.36
+          "elapsed_seconds": 15.48
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "回答提供了三个具体、自然且符合职场语境的替代表达，涵盖了不同沟通场景（具体修改、协作讨论、客观标准），完全符合rubric中“给具体自然的替代表达”的要求，且未涉及凭空指控或纯理论说教。",
+        "uncertain": false
+      }
+    },
+    {
+      "case_id": "single_hop-08",
+      "passed": false,
+      "checks": [
+        {
+          "name": "run_completed",
+          "passed": false
+        },
+        {
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
+          "passed": false
+        }
+      ],
+      "error": null,
+      "manual_review": null,
+      "runs": [
+        {
+          "run_id": "ffa1d9b6a9ab4206bedae76aea1cb360",
+          "status": "failed",
+          "elapsed_seconds": 24.28
+        }
+      ],
+      "review": {
+        "passed": false,
+        "reason": "回答未提供有效内容，仅报告执行失败，未满足rubric中关于均值、离散程度及样本量的要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "single_hop-09",
@@ -2889,7 +3508,11 @@
           "passed": true
         },
         {
-          "name": "exact_input_fact",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -2897,11 +3520,16 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "efd5da8fcd0342ff827b6bb532043562",
+          "run_id": "9fa40416a4c84d68a690e3d35bd86233",
           "status": "completed",
-          "elapsed_seconds": 8.46
+          "elapsed_seconds": 12.47
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "计算过程正确：14:00 + 45分钟 = 14:45，休息10分钟至14:55，再开30分钟至15:25，与rubric一致。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "typos-00",
@@ -2912,11 +3540,15 @@
           "passed": true
         },
         {
-          "name": "private_answer_and_citation",
+          "name": "private_retrieval_observed",
           "passed": true
         },
         {
-          "name": "private_tool_used",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -2924,11 +3556,16 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "b91de85630cc49ed940e104636b05c74",
+          "run_id": "4829c0ba50594001bc66b40cfb03c759",
           "status": "completed",
-          "elapsed_seconds": 40.18
+          "elapsed_seconds": 28.58
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "正确识别错别字并依据资料回答了450元上限及相关审批要求",
+        "uncertain": false
+      }
     },
     {
       "case_id": "typos-01",
@@ -2939,11 +3576,15 @@
           "passed": true
         },
         {
-          "name": "private_answer_and_citation",
+          "name": "private_retrieval_observed",
           "passed": true
         },
         {
-          "name": "private_tool_used",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -2951,11 +3592,16 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "6405da877cef4e19a1fc9ddc7ba1b879",
+          "run_id": "5b8aef1932624157980b860135e93037",
           "status": "completed",
-          "elapsed_seconds": 56.09
+          "elapsed_seconds": 21.61
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "回答正确理解了用户口语中的错别字（预越->预约），并依据提供的资料准确回答了预约截止时间（20:00）及相关限制条件，符合rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "typos-02",
@@ -2966,11 +3612,15 @@
           "passed": true
         },
         {
-          "name": "private_answer_and_citation",
+          "name": "private_retrieval_observed",
           "passed": true
         },
         {
-          "name": "private_tool_used",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -2978,11 +3628,16 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "8af59654a32e4988b8d5f7486b017c23",
+          "run_id": "b278d19a29bb47d5bb943e228bc3d2a8",
           "status": "completed",
-          "elapsed_seconds": 32.57
+          "elapsed_seconds": 61.62
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "回答正确理解了口语中的错别字（“坏拉”理解为故障），并依据提供的资料准确指出了“到货30天内非人为故障优先换机”的政策，同时涵盖了登记序列号、不自行拆机等关键步骤，符合rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "typos-03",
@@ -2993,11 +3648,15 @@
           "passed": true
         },
         {
-          "name": "private_answer_and_citation",
+          "name": "private_retrieval_observed",
           "passed": true
         },
         {
-          "name": "private_tool_used",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -3005,11 +3664,16 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "c6cb5dc9d2464848b9064e774416d487",
+          "run_id": "f6d0e7e6d718469a86f5b1653ac215f2",
           "status": "completed",
-          "elapsed_seconds": 31.98
+          "elapsed_seconds": 23.54
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "回答正确识别了‘平实分’为‘平时分’，并依据资料准确回答了期末占比50%及平时分权重20%，符合rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "typos-04",
@@ -3020,11 +3684,15 @@
           "passed": true
         },
         {
-          "name": "private_answer_and_citation",
+          "name": "private_retrieval_observed",
           "passed": true
         },
         {
-          "name": "private_tool_used",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -3032,11 +3700,16 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "60e5fc64796e44ccb2d2d9d80453998c",
+          "run_id": "01fe37a5e1e440dc823d1973c48c02ea",
           "status": "completed",
-          "elapsed_seconds": 44.22
+          "elapsed_seconds": 18.3
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "回答正确理解了‘报鸣’为‘报名’的错别字，依据资料确认8岁在7-12岁范围内，并明确提及需监护人陪同及每场限12组等关键约束，符合rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "typos-05",
@@ -3047,11 +3720,15 @@
           "passed": true
         },
         {
-          "name": "private_answer_and_citation",
+          "name": "private_retrieval_observed",
           "passed": true
         },
         {
-          "name": "private_tool_used",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -3059,11 +3736,16 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "27be4b9608484b71bc314dd5d66b8409",
+          "run_id": "9f6a7a4d18864ca5b12ad8212144b493",
           "status": "completed",
-          "elapsed_seconds": 55.5
+          "elapsed_seconds": 42.4
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "回答正确理解了口语化提问，依据提供的资料准确指出六千多元电脑采购需部门负责人和财务共同审批，并明确回答了财务需要参与审批，符合rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "web_retrieval-00",
@@ -3074,11 +3756,15 @@
           "passed": true
         },
         {
-          "name": "web_evidence_answer",
+          "name": "web_retrieval_observed",
           "passed": true
         },
         {
-          "name": "actual_fetch",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -3086,11 +3772,16 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "940e96ac476c45dd9f3644c9adc1cb37",
+          "run_id": "b0e89f600a244337bf109504f1381dc0",
           "status": "completed",
-          "elapsed_seconds": 90.69
+          "elapsed_seconds": 157.47
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "回答准确说明了国际儿童节源于1949年国际民主妇女联合会在莫斯科的决议及悼念利迪策惨案，并正确区分了中国1949年统一日期与国际起源，提供了可核对的维基百科来源。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "web_retrieval-01",
@@ -3101,11 +3792,15 @@
           "passed": true
         },
         {
-          "name": "web_evidence_answer",
+          "name": "web_retrieval_observed",
           "passed": true
         },
         {
-          "name": "actual_fetch",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -3113,11 +3808,16 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "fc3b46b0960546c8b2fb42a01d899fe2",
+          "run_id": "7f38e482013940d7870fe5b828865397",
           "status": "completed",
-          "elapsed_seconds": 187.21
+          "elapsed_seconds": 292.01
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "回答准确指出了论文名称《Attention Is All You Need》、年份2017年，并正确阐述了其核心改进是用自注意力机制替代了循环（RNN）和卷积结构。工具结果中获取了arXiv页面、NeurIPS会议论文PDF及Wikipedia页面，均证实了上述事实，来源可靠且与回答一致。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "web_retrieval-02",
@@ -3128,11 +3828,15 @@
           "passed": true
         },
         {
-          "name": "web_evidence_answer",
+          "name": "web_retrieval_observed",
           "passed": true
         },
         {
-          "name": "actual_fetch",
+          "name": "no_placeholder_answer",
+          "passed": true
+        },
+        {
+          "name": "model_rubric_review",
           "passed": true
         }
       ],
@@ -3140,92 +3844,70 @@
       "manual_review": null,
       "runs": [
         {
-          "run_id": "baa359c2a73f408e9e9ff8e2a5ebd082",
+          "run_id": "f086f8728bc74d98aeb83bc4aeb5deb6",
           "status": "completed",
-          "elapsed_seconds": 108.26
+          "elapsed_seconds": 120.05
         }
-      ]
+      ],
+      "review": {
+        "passed": true,
+        "reason": "回答正确解释了白天可见月亮的原理（反射太阳光、亮度对比、月相与位置），未声称月亮只在夜间出现，且引用了NASA、Farmers' Almanac等来源，符合rubric要求。",
+        "uncertain": false
+      }
     },
     {
       "case_id": "web_retrieval-03",
       "passed": false,
-      "checks": [
-        {
-          "name": "run_completed",
-          "passed": false
-        },
-        {
-          "name": "web_evidence_answer",
-          "passed": false
-        },
-        {
-          "name": "actual_fetch",
-          "passed": true
-        }
-      ],
-      "error": null,
+      "checks": [],
+      "error": "TimeoutError: run 38e1678c9cbc4b3eb778ef689d2dcbec exceeded 360s",
       "manual_review": null,
       "runs": [
         {
-          "run_id": "237e9a6d24114cfda95ef7d63b7911e6",
-          "status": "failed",
-          "elapsed_seconds": 305.63
+          "run_id": "38e1678c9cbc4b3eb778ef689d2dcbec",
+          "status": "timeout",
+          "elapsed_seconds": 360,
+          "status_after_stop": "stopped"
         }
-      ]
+      ],
+      "review": null
     },
     {
       "case_id": "web_retrieval-04",
-      "passed": true,
-      "checks": [
-        {
-          "name": "run_completed",
-          "passed": true
-        },
-        {
-          "name": "web_evidence_answer",
-          "passed": true
-        },
-        {
-          "name": "actual_fetch",
-          "passed": true
-        }
-      ],
-      "error": null,
+      "passed": false,
+      "checks": [],
+      "error": "TimeoutError: run f50788a560204a718ac725fad1012a3a exceeded 360s",
       "manual_review": null,
       "runs": [
         {
-          "run_id": "cb15c0d9b57f4da4842edc6bed88f728",
-          "status": "completed",
-          "elapsed_seconds": 158.75
+          "run_id": "f50788a560204a718ac725fad1012a3a",
+          "status": "timeout",
+          "elapsed_seconds": 360,
+          "status_after_stop": "stopped"
         }
-      ]
+      ],
+      "review": null
     },
     {
       "case_id": "web_retrieval-05",
-      "passed": true,
-      "checks": [
-        {
-          "name": "run_completed",
-          "passed": true
-        },
-        {
-          "name": "web_evidence_answer",
-          "passed": true
-        },
-        {
-          "name": "actual_fetch",
-          "passed": true
-        }
-      ],
-      "error": null,
+      "passed": false,
+      "checks": [],
+      "error": "TimeoutError: run 7df2efd637d74af889cfdc161e8c1e3f exceeded 360s",
       "manual_review": null,
       "runs": [
         {
-          "run_id": "8e71b6b263954fc1b1f0ff8263f9bc87",
-          "status": "completed",
-          "elapsed_seconds": 294.43
+          "run_id": "7df2efd637d74af889cfdc161e8c1e3f",
+          "status": "timeout",
+          "elapsed_seconds": 360,
+          "status_after_stop": "stopped"
         }
-      ]
+      ],
+      "review": null
     }
-  ]
+  ],
+  "mode": "natural_language_v2",
+  "operational_passed": 61,
+  "semantic_review_passed": 70,
+  "semantic_review_count": 92,
+  "not_reviewed": 8,
+  "uncertain_reviews": 0
 }

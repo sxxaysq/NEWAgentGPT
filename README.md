@@ -54,10 +54,11 @@ python -m ruff check agentgpt tests
 python scripts/validate_memory_v3.py --output artifacts/contracts.json
 # 以下会调用真实模型并创建合成测试账号/文档：
 python scripts/validate_memory_live.py --base http://127.0.0.1:18210
-python scripts/benchmark_live_100.py --output artifacts/live100 --parallel 3
+python scripts/benchmark_natural100.py --output artifacts/natural100 --parallel 3
+python scripts/render_natural_report.py artifacts/natural100 docs/LIVE100_REPORT.md
 ```
 
-应用版本通过本地及 Linux 服务器各 191 项回归；加入评测采集器回归后，发布包本地 **192 项测试全部通过**。100 场景真实执行结果及各类代表案例见 [执行报告](docs/LIVE100_REPORT.md)。无模型调用的契约测试与真实 API 场景分开统计，确定性断言不替代完整语义评审。
+应用版本通过本地及 Linux 服务器各 191 项回归；加入评测采集器回归后，发布包本地 **192 项测试全部通过**。新版自然语言100场景真实执行结果及各类代表案例见 [执行报告](docs/LIVE100_REPORT.md)。无模型调用的契约测试与真实 API 场景分开统计，确定性断言不替代完整语义评审。
 
 ## 已知边界
 
@@ -65,4 +66,8 @@ python scripts/benchmark_live_100.py --output artifacts/live100 --parallel 3
 
 部署数据、用户文档、密钥、模型权重和运行数据库均不在此仓库中。SQLite 是权威记录，向量索引可重建；更新前请备份源码、配置、业务数据库及各角色 TaskStore。
 
-真实评测自动断言通过 **96/100**；其中 1 个未通过经人工复核为断言误报，另有 3 个实际运行失败/超时。共173轮、910个A2A任务、443次工具回执记录。详见报告中的统计口径与失败记录。
+新版自然语言评测：100场景、162轮运行；操作条件通过61例，同模型内容评阅通过70/92例，综合通过57例。8例未进入内容评阅。不同判据不等同于通用准确率，详见报告中的统计口径与失败记录。
+
+新版附件：[全部100个自然问题及验收重点](docs/NATURAL100_DESIGN.md) · [六篇长文本完整实际答复](docs/LONG_TEXT_ANSWERS_V2.md) · [旧版报告归档](docs/archive/LIVE100_REPORT_V1.md)。
+
+自然语言完整评测需要已配置并启用长期记忆、私有检索及可用的联网通路；运行会创建合成账号与资料。保留输出目录可跳过已完成案例继续执行。统计同时检查操作状态与同模型内容评阅，不是独立人工准确率。

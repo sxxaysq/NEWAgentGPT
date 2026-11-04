@@ -1,6 +1,5 @@
 {
-  "application_commit": "55aecd7f3f7ee9a2522521f2539a800aee419aba",
-  "mode": "real_api_100",
+  "mode": "natural_language_real_api_v2",
   "counts": {
     "single_hop": 10,
     "multi_step": 10,
@@ -15,29 +14,9 @@
     "cross_session": 10,
     "boundary": 4
   },
-  "deployment_settings": {
-    "model_name": "qwen3.8-27b",
-    "model_context_tokens": 131072,
-    "memory_enabled": true,
-    "rag_enabled": true,
-    "memory_embedding_model": "BAAI/bge-m3",
-    "memory_embedding_dimensions": 1024,
-    "document_embedding_model": "BAAI/bge-m3",
-    "document_embedding_dimensions": 1024,
-    "max_parallel": 3,
-    "task_max_tool_calls": 12,
-    "task_max_retries": 2,
-    "task_wall_clock_s": 180,
-    "run_wall_clock_s": 900,
-    "reranker_configured": true,
-    "tokenizer_service_configured": true,
-    "sampling": {
-      "temperature": 0.3,
-      "max_tokens": 2000,
-      "language": "简体中文"
-    }
-  },
-  "deployment_source_sha256": {
+  "corpus_sha256": "9b71b67e7a651928eea8c76803314ebc9af566c51d982c909ef7a0b90aa706f8",
+  "judging": "Operational assertions plus a separate evaluation call to the SAME model. Not independent human ground truth.",
+  "source_sha256": {
     "agentgpt/config.py": "204379d45901f14cdb2f8e245cd7b67dc9707ed7c2d3ee213cedd85726b0a6a6",
     "agentgpt/memory_store.py": "13e7aef4758866525b6fa0b8653c528a4e28a381651f7169ecdc56dce356192f",
     "agentgpt/model.py": "819330c6cb2d946f2a29295bb5fb967e7330fc2f590ff34cbe5c68d906b12278",
@@ -80,5 +59,17 @@
     "agentgpt/host/session_state.py": "4eadb1df3e386ecb252361aa01038840a2e418874f2157210de43a91647cb756",
     "agentgpt/host/orchestrator.py": "e0dae8d0476c55d008102c0cb6772b86ddc18a2f7effaefcb195349f235ade15"
   },
-  "note": "Hashes refer to deployed source bytes; Git may normalize line endings."
+  "network_note": "4 initial network-outage records archived; web cases rerun after SSH loopback proxy restored on 2026-11-04.",
+  "corpus_canonical_sha256": "01b830b2d74393dea55af651d25bcc9e4c39f20c2c060960e4aa013c288208bd",
+  "deployment_settings": {
+    "model_name": "qwen3.8-27b",
+    "model_context_tokens": 131072,
+    "memory_enabled": true,
+    "rag_enabled": true,
+    "memory_embedding_model": "BAAI/bge-m3",
+    "memory_embedding_dimensions": 1024,
+    "task_max_tool_calls": 12,
+    "task_max_retries": 2,
+    "task_wall_clock_s": 180
+  }
 }
