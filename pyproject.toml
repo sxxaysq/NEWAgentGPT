@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "agentgpt-refactor"
 version = "0.1.0"
-description = "A minimal LangGraph AgentGPT with a unified MCP tool layer"
+description = "基于 A2A 和 MCP 的多智能体任务助手，支持网页交互、资料检索与长期记忆"
 requires-python = ">=3.11"
 dependencies = [
   "a2a-sdk[http-server]==1.3.0",
