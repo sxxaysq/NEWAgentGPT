@@ -1,73 +1,140 @@
 # NEWAgentGPT
 
-基于官方 A2A SDK 的五进程 Agent 系统，提供网页界面、任务规划、工具执行、证据审核、答案合成、私有文档 RAG，以及可追溯的多轮上下文与长期记忆。
+NEWAgentGPT 是一个带网页界面的多智能体任务助手。输入目标后，它会拆分任务、调用工具查找资料、检查结果，再整理成答复。你可以查看执行进度，在同一会话里继续提问，也可以上传文档供它检索。
 
-## 架构
+项目使用官方 A2A SDK 连接各个智能体，通过 MCP 调用工具。会话、任务和记忆保存在 SQLite 中，网页界面随服务一起启动。
+
+## 工作方式
+
+服务由五个独立进程组成：Host 接收请求并调度任务，Planner 制定计划，Worker 执行任务，Critic 检查结果和引用来源，Synthesizer 整理最终答复。
 
 ```mermaid
 flowchart LR
-    UI[Web UI] --> H[Host · 18210]
-    H --> P[Planner · 18211]
-    H --> W[Worker · 18212]
-    H --> C[Critic · 18213]
-    H --> S[Synthesizer · 18214]
-    W --> T[MCP tools]
-    H --> DB[(SQLite turns / state / summaries / memory)]
-    W --> R[Private RAG / Web retrieval]
+    UI[网页界面] --> H[Host · 18210]
+    H --> P[Planner · 规划 · 18211]
+    H --> W[Worker · 执行 · 18212]
+    H --> C[Critic · 审核 · 18213]
+    H --> S[Synthesizer · 汇总 · 18214]
+    W --> T[MCP 工具：网页搜索、正文读取、私有资料检索]
+    H --> DB[(SQLite：会话、任务、摘要、记忆)]
 ```
 
-Host 负责认证、持久命令队列、依赖调度、证据授权和终态事务。Planner 拆解任务；Worker 自主调用已授权工具；Critic 检查产物和来源；Synthesizer 形成最终答复。独立任务可以并发执行，依赖任务等待上游产物。
+没有依赖关系的任务可以同时执行；需要上游结果的任务会等待。网页上可以查看任务状态和工具调用记录，也可以暂停、继续或停止当前任务。
 
-## 快速启动
+## 快速开始
 
-要求 Python 3.11+。五进程控制脚本使用 Linux `/proc`；Windows 可分别启动各角色。
+需要 Python 3.11 或更高版本，以及可用的 OpenAI 兼容模型服务。以下命令在 Linux 下执行。
+
+### 安装
 
 ```bash
+git clone https://github.com/sxxaysq/NEWAgentGPT.git
+cd NEWAgentGPT
 python -m venv .venv
 source .venv/bin/activate
-pip install -e '.[dev]'
+python -m pip install -e '.[dev]'
 cp .env.example .env
-# 编辑 .env：设置模型服务、模型名和随机 A2A_SECRET
+```
+
+### 配置
+
+编辑 `.env`，先填写模型服务和进程间通信密钥：
+
+| 配置项 | 填写内容 |
+| --- | --- |
+| `MODEL_BASE_URL` | 模型接口地址，例如 `http://127.0.0.1:8000/v1` |
+| `MODEL_NAME` | 模型服务实际提供的模型名称 |
+| `MODEL_API_KEY` | 模型服务的访问密钥；无需鉴权时可保留 `not-required` |
+| `A2A_SECRET` | 自行生成的随机密钥，五个进程使用同一个值 |
+
+其余配置可先保留示例值。需要网页搜索时，按网络环境填写 `SEARCH_PROXY`；使用 Tavily 搜索时填写 `TAVILY_API_KEY`。
+
+### 启动
+
+```bash
 python scripts/a2a_ctl.py start
 ```
 
-浏览器打开 `http://127.0.0.1:18210`，注册账号后创建任务。停止服务：`python scripts/a2a_ctl.py stop`。
+打开 <http://127.0.0.1:18210>，注册账号后新建目标。可以先试一句：“为 Python 初学者制定三步学习计划，每步包含一个练习。”
 
-手动运行角色：`python -m agentgpt --role planner`（另有 worker、critic、synthesizer）。Host 可使用 `uvicorn agentgpt.app:app --host 127.0.0.1 --port 18210`。同一部署的五个角色必须使用相同 DATA_DIR，手动启动时请自行在环境中设置；控制脚本默认使用项目下的 ui_data。
+查看状态和停止服务：
 
-MCP 内置工具提供网页搜索、网页正文读取、私有文档搜索和原文读取。网页访问需要可用网络；可配置 `SEARCH_PROXY`、`TAVILY_API_KEY`。上传文档后等待入库完成，再选择对应知识库。
+```bash
+python scripts/a2a_ctl.py status
+python scripts/a2a_ctl.py stop
+```
 
-## 记忆与上下文
+控制脚本默认将数据写入项目下的 `ui_data/`，日志写入 `logs/`。
 
-- 原始用户轮次、会话状态、历史摘要、跨会话记忆分开保存；关闭长期记忆仍保留本会话连续性。
-- 请求先落库，完成状态和派生任务原子提交。摘要及状态有来源、版本和连续覆盖范围；异步滞后由原文增量补偿。
-- `memory_scope` 是项目记忆范围，`knowledge_base` 是文档范围，两者独立；项目事实需要明确 memory_scope。
-- 记忆使用 Dense + FTS5 trigram + 编号候选并集，可选重排。权限和版本在召回、恢复及新角色下发时复核。
-- `context_ids` 用于授权用户原话与记忆；`evidence_ids` 用于本轮文档或网页证据，不能混用。
-- 模型请求发送前检查完整输入预算。配置 `MODEL_TOKENIZER_URL` 使用模型服务计数；未配置时明确使用估算模式，不能视作严格 token 保证。
+<details>
+<summary>Windows 手动启动</summary>
 
-## 验证
+在项目目录中打开 PowerShell，安装依赖并复制配置文件：
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -e ".[dev]"
+Copy-Item .env.example .env
+```
+
+按上表编辑 `.env`，并加入 `DATA_DIR=./ui_data`。下面每条命令各占一个终端；所有终端都在项目目录中运行，并先激活同一个虚拟环境。先启动四个智能体，最后启动 Host：
+
+```powershell
+python -m agentgpt --role worker
+python -m agentgpt --role critic
+python -m agentgpt --role synthesizer
+python -m agentgpt --role planner
+python -m uvicorn agentgpt.app:app --host 127.0.0.1 --port 18210
+```
+
+启动后同样访问 <http://127.0.0.1:18210>。停止时在各终端按 `Ctrl+C`。
+
+</details>
+
+## 资料与记忆
+
+在“私有资料”中上传文档，等待处理完成，再在运行设置中选择知识库。支持 TXT、Markdown、CSV、JSON 和文本 PDF。`knowledge_base` 指定本次任务检索哪个知识库。
+
+同一会话会保留前面的对话和修改。跨会话长期记忆默认关闭；需要使用时，在 `.env` 中设置 `MEMORY_ENABLED=true`，并在网页的“长期记忆”中开启。项目相关事实通过 `memory_scope` 区分，与知识库设置相互独立。
+
+文档向量检索通过 `RAG_ENABLED=true` 开启。记忆和文档可分别配置 `MEMORY_EMBEDDING_URL`、`DOCUMENT_EMBEDDING_URL`；模型名称及向量维度需与对应服务一致。完整配置见 [`.env.example`](.env.example)。
+
+## 目录说明
+
+| 目录或文件 | 用途 |
+| --- | --- |
+| [`agentgpt/`](agentgpt/) | 网页界面、接口、智能体、任务调度、记忆和检索 |
+| [`scripts/`](scripts/) | 服务管理、评测、报告生成和索引重建脚本 |
+| [`tests/`](tests/) | 协议、调度、恢复、上下文、记忆及检索测试 |
+| [`datasets/`](datasets/) | 100 个自然语言测试场景及验收要求 |
+| [`docs/`](docs/) | 评测报告、完整答复和历史记录 |
+| [`.env.example`](.env.example) | 模型、通信、记忆和检索配置示例 |
+| [`pyproject.toml`](pyproject.toml) | 项目依赖及开发工具配置 |
+| [`requirements.lock.txt`](requirements.lock.txt) | 固定版本的依赖清单 |
+
+## 测试与评测
+
+本地回归和静态检查：
 
 ```bash
 python -m pytest -q
 python -m ruff check agentgpt tests
 python scripts/validate_memory_v3.py --output artifacts/contracts.json
-# 以下会调用真实模型并创建合成测试账号/文档：
+```
+
+服务启动后，可运行真实模型评测。运行前需配置长期记忆、私有文档检索和联网搜索；脚本会创建测试账号及资料，并调用模型服务。
+
+```bash
 python scripts/validate_memory_live.py --base http://127.0.0.1:18210
 python scripts/benchmark_natural100.py --output artifacts/natural100 --parallel 3
 python scripts/render_natural_report.py artifacts/natural100 docs/LIVE100_REPORT.md
 ```
 
-应用版本通过本地及 Linux 服务器各 191 项回归；加入评测采集器回归后，发布包本地 **192 项测试全部通过**。新版自然语言100场景真实执行结果及各类代表案例见 [执行报告](docs/LIVE100_REPORT.md)。无模型调用的契约测试与真实 API 场景分开统计，确定性断言不替代完整语义评审。
+已有记录可直接查看：
 
-## 已知边界
+- [100 个场景的执行结果与代表案例](docs/LIVE100_REPORT.md)
+- [全部测试问题及验收要求](docs/NATURAL100_DESIGN.md)
+- [六篇长文本任务的完整答复](docs/LONG_TEXT_ANSWERS_V2.md)
 
-超长必需输入会明确要求拆分，尚未自动分块转换；API 单次输入上限为 8000 字符。摘要来源检查不能保证语义完全正确。自动容量/时间归档尚未启用。暂停/继续测试不能替代 SIGKILL 故障注入；独立恢复单测覆盖进程崩溃和工具回执复用。
-
-部署数据、用户文档、密钥、模型权重和运行数据库均不在此仓库中。SQLite 是权威记录，向量索引可重建；更新前请备份源码、配置、业务数据库及各角色 TaskStore。
-
-新版自然语言评测：100场景、162轮运行；操作条件通过61例，同模型内容评阅通过70/92例，综合通过57例。8例未进入内容评阅。不同判据不等同于通用准确率，详见报告中的统计口径与失败记录。
-
-新版附件：[全部100个自然问题及验收重点](docs/NATURAL100_DESIGN.md) · [六篇长文本完整实际答复](docs/LONG_TEXT_ANSWERS_V2.md) · [旧版报告归档](docs/archive/LIVE100_REPORT_V1.md)。
-
-自然语言完整评测需要已配置并启用长期记忆、私有检索及可用的联网通路；运行会创建合成账号与资料。保留输出目录可跳过已完成案例继续执行。统计同时检查操作状态与同模型内容评阅，不是独立人工准确率。
+测试条件、统计方法和逐项结果都在报告中。
