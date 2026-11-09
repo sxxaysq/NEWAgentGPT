@@ -112,29 +112,3 @@ python -m uvicorn agentgpt.app:app --host 127.0.0.1 --port 18210
 | [`.env.example`](.env.example) | 模型、通信、记忆和检索配置示例 |
 | [`pyproject.toml`](pyproject.toml) | 项目依赖及开发工具配置 |
 | [`requirements.lock.txt`](requirements.lock.txt) | 固定版本的依赖清单 |
-
-## 测试与评测
-
-本地回归和静态检查：
-
-```bash
-python -m pytest -q
-python -m ruff check agentgpt tests
-python scripts/validate_memory_v3.py --output artifacts/contracts.json
-```
-
-服务启动后，可运行真实模型评测。运行前需配置长期记忆、私有文档检索和联网搜索；脚本会创建测试账号及资料，并调用模型服务。
-
-```bash
-python scripts/validate_memory_live.py --base http://127.0.0.1:18210
-python scripts/benchmark_natural100.py --output artifacts/natural100 --parallel 3
-python scripts/render_natural_report.py artifacts/natural100 docs/LIVE100_REPORT.md
-```
-
-已有记录可直接查看：
-
-- [100 个场景的执行结果与代表案例](docs/LIVE100_REPORT.md)
-- [全部测试问题及验收要求](docs/NATURAL100_DESIGN.md)
-- [六篇长文本任务的完整答复](docs/LONG_TEXT_ANSWERS_V2.md)
-
-测试条件、统计方法和逐项结果都在报告中。
