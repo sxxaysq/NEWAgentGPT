@@ -174,11 +174,12 @@ class TurnStore:
                 )
                 resumed = await one(db, "SELECT context FROM runs WHERE id=?", (run_id,))
                 checkpoint = json.loads(resumed["context"] or "{}")
+                checkpoint.pop("recovery", None)
                 if isinstance(checkpoint.get("orchestrator"), dict):
                     checkpoint["orchestrator"]["deadline_at"] = None
-                    await db.execute(
-                        "UPDATE runs SET context=? WHERE id=?", (encode(checkpoint), run_id)
-                    )
+                await db.execute(
+                    "UPDATE runs SET context=? WHERE id=?", (encode(checkpoint), run_id)
+                )
             elif operation == "stop":
                 paused = await one(
                     db,
@@ -291,9 +292,10 @@ class TurnStore:
                 now,
             ),
         )
-        await enqueue_projection(
-            db, "state", input_id, 0, input_seq, thread["user_id"], thread["id"]
-        )
+        if not getattr(self, "memory_lite", False):
+            await enqueue_projection(
+                db, "state", input_id, 0, input_seq, thread["user_id"], thread["id"]
+            )
         return turn_id
 
     async def ensure_turn_for_run(self, run_id):
@@ -456,7 +458,7 @@ class TurnStore:
             "UPDATE conversations SET status=?,updated=? WHERE id=?",
             (outcome, now, turn["thread_id"]),
         )
-        if outcome != "paused":
+        if outcome != "paused" and not getattr(self, "memory_lite", False):
             for kind in ("turn_summary", "thread_summary"):
                 await enqueue_projection(
                     db,
@@ -517,6 +519,8 @@ class TurnStore:
             )
 
     async def reconcile_turns(self, memory_enabled=False):
+        if getattr(self, "memory_lite", False):
+            return
         async with self.connect() as db:
             await db.execute("BEGIN IMMEDIATE")
             for item in await many(db, "SELECT * FROM turn_inputs"):

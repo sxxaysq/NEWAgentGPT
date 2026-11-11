@@ -44,6 +44,8 @@ class TaskStore(SDKTaskStore):
                 for row in db.execute("SELECT * FROM a2a_tasks WHERE run_id IS NOT NULL"):
                     task = Parse(row["payload"], Task())
                     if task.status.state in (
+                        # The executor's first save can precede the WORKING event commit.
+                        TaskState.TASK_STATE_UNSPECIFIED,
                         TaskState.TASK_STATE_SUBMITTED,
                         TaskState.TASK_STATE_WORKING,
                     ):

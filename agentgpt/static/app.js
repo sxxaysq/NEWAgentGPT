@@ -297,7 +297,8 @@ setInterval(()=>{if($('knowledge-dialog').open)guarded(listDocuments)();},3000);
 
 async function listMemories(){
   const data=await api('/api/memories'); $('memory-enabled').checked=!!data.preference.enabled;
-  $('memory-status').textContent=data.available?`自动抽取：待处理 ${(data.jobs.queued||0)+(data.jobs.running||0)} · 已完成 ${data.jobs.done||0} · 失败 ${data.jobs.failed||0}。索引更新可能稍有延迟。`:'自动记忆服务未启用；仍可管理已保存的记忆。';
+  const lite=data.mode==='lite'; $('memory-retry').hidden=lite;
+  $('memory-status').textContent=!data.available?'自动记忆服务未启用；仍可管理已保存的记忆。':!data.preference.enabled?'已关闭自动记忆与召回；仍可管理已保存的记忆。':lite?'自动保存你明确表达的长期偏好，并在后续会话中使用。临时要求仅用于当前对话；未保存的信息可在新消息中重新提供。':`自动抽取：待处理 ${(data.jobs.queued||0)+(data.jobs.running||0)} · 已完成 ${data.jobs.done||0} · 失败 ${data.jobs.failed||0}。索引更新可能稍有延迟。`;
   $('memory-items').replaceChildren();
   for(const item of data.items){
     const row=document.createElement('div');row.className='document-row';

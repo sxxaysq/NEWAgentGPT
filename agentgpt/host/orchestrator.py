@@ -29,6 +29,7 @@ from agentgpt.a2a.auth import RunScope
 from agentgpt.a2a.client import A2AClient, AgentError, RecoveryPending, task_payload
 from agentgpt.config import ModelOptions, Settings
 from agentgpt.host.context import authorized_context_sources, role_context
+from agentgpt.host.memory_receipts import sanitize_memory_claims
 from agentgpt.store import Store
 
 log = logging.getLogger(__name__)
@@ -168,6 +169,7 @@ class Orchestrator:
 
     async def _say(self, text: str) -> None:
         """Stream the answer as one live message; the view dedupes on the message id."""
+        text = sanitize_memory_claims(text, self.context.get("memory_receipt"))
         for start in range(0, len(text), 2000):
             await self.emit(
                 "token",
@@ -191,6 +193,8 @@ class Orchestrator:
             if isinstance(background, dict)
             else {"memory_context": background}
         )
+        if isinstance(background, dict) and background.get("memory_receipt"):
+            self.context["memory_receipt"] = background["memory_receipt"]
         self.context["current_request"] = goal
         manifest = self.context.setdefault("manifest", {})
         if manifest and (
@@ -249,6 +253,7 @@ class Orchestrator:
                 "运行已暂停，可继续执行。" if self.completion_status == "paused" else "运行已停止。"
             )
         answer = await self._synthesize(scope, goal, options)
+        answer = sanitize_memory_claims(answer, self.context.get("memory_receipt"))
         if not any(state.status == "completed" for state in self.tasks.values()):
             self.completion_status = "failed"
         if not answer.strip():

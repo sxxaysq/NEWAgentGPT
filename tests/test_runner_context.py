@@ -1,11 +1,13 @@
 """The actual Host lifecycle uses persisted inputs, not prior UI projections."""
 
+import asyncio
 import json
 
 import pytest
 
 from agentgpt.config import Settings
-from agentgpt.host.runner import RunManager
+from agentgpt.host.runner import NullMemory, RunManager
+from agentgpt.memory_lite import LiteMemory, Request
 from agentgpt.store import Store
 
 
@@ -154,3 +156,124 @@ async def test_dispatch_checks_automatic_fact_versions_without_preference_bump(h
         )
     with pytest.raises(ValueError, match="版本或权限"):
         await manager._validate_memory_snapshot(RunScope("alice", "t", "r"), "", background)
+
+
+@pytest.mark.parametrize("change", ["unrelated", "update", "delete", "disable", "scope"])
+async def test_resume_checks_injected_memories_without_rebuilding_background(host, change):
+    store, manager = host
+    manager.settings.memory_enabled = True
+    memory_id = await store.edit_memory("alice", "回答简洁")
+    pref = await store.memory_preference("alice")
+    thread = await store.create_thread("alice", "goal", {})
+    row, _ = await store.enqueue_run(thread, "start", "", None, "one")
+    background = {
+        "manifest": {
+            "user_id": "alice",
+            "thread_id": thread["id"],
+            "memory_revision": pref["revision"],
+        },
+        "memory_context": [{"id": memory_id, "version": 1, "content": "回答简洁"}],
+        "frozen_marker": "original dispatch context",
+    }
+    await store.update_run(
+        row["id"],
+        context=json.dumps(
+            {
+                "version": 1,
+                "memory_enabled": True,
+                "memory_revision": pref["revision"],
+                "background": background,
+                "orchestrator": {"plan": {}},
+            }
+        ),
+    )
+    if change == "unrelated":
+        await store.edit_memory("alice", "新增但本次未注入的偏好")
+    elif change in {"update", "delete"}:
+        await store.edit_memory(
+            "alice", "详细回答", memory_id=memory_id, expected_version=1, delete=change == "delete"
+        )
+    elif change == "disable":
+        await store.set_memory_preference("alice", False)
+    else:
+        async with store.connect() as db:
+            await db.execute("UPDATE memories SET scope='other-project' WHERE id=?", (memory_id,))
+    await manager.recover()
+    await manager.running[thread["id"]]
+    outcome = (await store.turn_for_run(row["id"]))["outcome"]
+    if change == "unrelated":
+        assert outcome == "completed"
+        assert StubOrchestrator.seen[0][3] == background
+    else:
+        assert outcome == "failed"
+        assert not StubOrchestrator.seen
+
+
+async def test_shutdown_during_preference_extraction_recovers_original_input(host):
+    store, manager = host
+    manager.settings.memory_enabled = store.memory_enabled = store.memory_lite = True
+    entered = asyncio.Event()
+
+    async def interrupted_parser(text, rows):
+        entered.set()
+        await asyncio.Event().wait()
+
+    manager.memory = LiteMemory(store, manager.settings, parser=interrupted_parser)
+    thread = await store.create_thread("alice", "请解释事务", {})
+    run_id = await manager.command(thread, "start", request_id="slow-extraction")
+    await asyncio.wait_for(entered.wait(), timeout=5)
+    saved = json.loads((await store.run(run_id))["context"])
+    assert saved["version"] == 1 and saved["goal"] == thread["goal"]
+    await manager.close()
+
+    parsed = []
+
+    async def parser(text, rows):
+        parsed.append(text)
+        return Request(intent="none")
+
+    memory = LiteMemory(store, manager.settings, parser=parser)
+    recovered = RunManager(store, None, manager.settings, memory=memory)
+    try:
+        await recovered.recover()
+        await recovered.running[thread["id"]]
+        assert parsed == [thread["goal"]]
+        assert (await store.turn_for_run(run_id))["outcome"] == "completed"
+        assert (await store.run(run_id))["attempts"] == 2
+        assert len(StubOrchestrator.seen) == 1
+    finally:
+        await recovered.close()
+
+
+@pytest.mark.parametrize(
+    "status,intent,remaining,dispatched,notice",
+    [
+        ("noop", "none", "", True, ""),
+        ("failed", "automatic", "", True, "长期偏好提取失败"),
+        ("disabled", "none", "", True, "长期记忆已关闭"),
+        ("committed", "automatic", "", True, "已保存：回答简洁"),
+        ("committed", "explicit", "", False, "已保存：回答简洁"),
+    ],
+)
+async def test_only_committed_explicit_memory_command_skips_business(
+    host, status, intent, remaining, dispatched, notice
+):
+    store, manager = host
+    store.memory_lite = True
+
+    class ReceiptMemory(NullMemory):
+        async def handle(self, *_args):
+            return dict(status=status, intent=intent, remaining=remaining, message=notice)
+
+    manager.memory = ReceiptMemory()
+    thread = await store.create_thread("alice", "请解释事务", {})
+    run_id = await complete(manager, thread)
+    turn = await store.turn_for_run(run_id)
+    assert turn["outcome"] == "completed"
+    assert bool(StubOrchestrator.seen) == dispatched
+    if dispatched:
+        assert StubOrchestrator.seen[0][1] == thread["goal"]
+    if status == "disabled":
+        assert notice not in turn["assistant_text"]
+    elif notice:
+        assert notice in turn["assistant_text"]

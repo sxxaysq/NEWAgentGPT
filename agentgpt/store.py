@@ -18,6 +18,7 @@ from agentgpt.durable import DurableStore
 from agentgpt.evidence_store import SCHEMA as EVIDENCE_SCHEMA
 from agentgpt.evidence_store import EvidenceStore
 from agentgpt.host.turns import TurnStore
+from agentgpt.memory_lite import SCHEMA as LITE_SCHEMA
 from agentgpt.memory_store import SCHEMA as MEMORY_SCHEMA
 from agentgpt.memory_store import MemoryStore
 
@@ -61,7 +62,7 @@ class Store(TurnStore, DurableStore, MemoryStore, EvidenceStore, DocumentStore):
                     call_key TEXT PRIMARY KEY, result TEXT NOT NULL, created REAL NOT NULL);
             """)
             await db.executescript(
-                DURABLE_SCHEMA + MEMORY_SCHEMA + EVIDENCE_SCHEMA + DOCUMENT_SCHEMA
+                DURABLE_SCHEMA + MEMORY_SCHEMA + EVIDENCE_SCHEMA + DOCUMENT_SCHEMA + LITE_SCHEMA
             )
             await self.initialize_turn_schema(db)
             if hasattr(self, "initialize_memory_schema"):

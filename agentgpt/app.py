@@ -21,6 +21,7 @@ from agentgpt.config import ROOT, ModelOptions, settings
 from agentgpt.host.runner import RunManager
 from agentgpt.host.summaries import SummaryService
 from agentgpt.memory import MemoryService
+from agentgpt.memory_lite import LiteMemory
 from agentgpt.store import Store
 
 
@@ -41,19 +42,22 @@ async def application_services(app):
     registry = Registry.from_urls(settings.agent_urls())
     client = A2AClient(registry, settings.a2a_secret)
     await client.discover()
-    memory = MemoryService(store, settings)
-    summaries = SummaryService(store, settings)
+    store.memory_lite = settings.memory_mode == "lite"
+    memory = LiteMemory(store, settings) if store.memory_lite else MemoryService(store, settings)
+    summaries = None if store.memory_lite else SummaryService(store, settings)
     runs = RunManager(store, client, settings, memory=memory, summaries=summaries)
     app.state.store, app.state.client, app.state.runs = store, client, runs
     app.state.memory = runs.memory
     try:
         memory.start()
-        summaries.start()
+        if summaries:
+            summaries.start()
         await runs.recover()
         yield
     finally:
         await runs.close()
-        await summaries.close()
+        if summaries:
+            await summaries.close()
         await memory.close()
 
 
@@ -274,6 +278,7 @@ async def memories(request: Request, user=Depends(current_user)):
         "preference": await store.memory_preference(user["id"]),
         "jobs": await store.memory_job_status(user["id"]),
         "available": settings.memory_enabled,
+        "mode": settings.memory_mode,
     }
 
 
@@ -285,6 +290,8 @@ async def memory_preference(body: MemoryPreference, request: Request, user=Depen
 
 @app.post("/api/memory-jobs/retry")
 async def retry_memory_jobs(request: Request, user=Depends(current_user)):
+    if settings.memory_mode == "lite":
+        raise HTTPException(409, "本模式逐轮处理记忆；未保存的信息可在新消息中重新提供。")
     count = await request.app.state.store.retry_memory_jobs(user["id"])
     request.app.state.memory.wake.set()
     return {"retried": count}

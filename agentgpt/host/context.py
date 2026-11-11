@@ -168,6 +168,19 @@ class ContextAssembler:
         scope="",
     ) -> dict:
         snapshot = await self.store.context_snapshot(user_id, thread_id, before_input_seq)
+        lite = getattr(self.store, "memory_lite", False)
+        if lite:
+            from agentgpt.host.lite_summary import prepare_snapshot
+
+            snapshot = await prepare_snapshot(
+                self.store,
+                self.settings,
+                snapshot,
+                user_id,
+                thread_id,
+                before_input_seq,
+                self.counter,
+            )
         session = copy.deepcopy(snapshot.get("session") or {})
         watermark = session.get("covered_until_input_seq", -1)
         if watermark >= before_input_seq:
@@ -210,9 +223,9 @@ class ContextAssembler:
             "session": session,
             "pending_user_updates": pending,
             "previous_answer": previous_answer,
-            "recent_turns": turns[-3:],
+            "recent_turns": turns[-self.settings.memory_recent_turns :] if lite else turns[-3:],
             "thread_summary": summary,
-            "turn_summaries": snapshot.get("turn_summaries", [])[-20:],
+            "turn_summaries": [] if lite else snapshot.get("turn_summaries", [])[-20:],
             "memory_context": memory_context,
             "manifest": {
                 "user_id": user_id,
@@ -229,7 +242,9 @@ class ContextAssembler:
         # Mandatory state, new corrections, and the complete target answer remain.
         # Older narrative leaves whole, preserving negations, IDs and table rows.
         budget = self.settings.context_history_tokens
-        for field in ("memory_context", "turn_summaries", "thread_summary", "recent_turns"):
+        for field in (
+            () if lite else ("memory_context", "turn_summaries", "thread_summary", "recent_turns")
+        ):
             if self.counter.count_text(_json(context)) <= budget:
                 break
             context[field] = (
@@ -261,6 +276,11 @@ class ContextAssembler:
             if item["input_seq"] < before_input_seq
         }
         excerpts = {}
+        if lite and summary:
+            for quote in summary.get("content", "").splitlines():
+                for source_id, source in inputs.items():
+                    if quote.strip() and quote in source["text"]:
+                        excerpts.setdefault(source_id, set()).add(quote)
         for item in session.get("constraints", []) + session.get("objects", []):
             source_id, quote = item.get("source_input_id"), item.get("quote", "")
             source = inputs.get(source_id)
@@ -295,6 +315,7 @@ def role_context(data: dict) -> dict:
         key: data[key]
         for key in (
             "current_request",
+            "memory_receipt",
             "session",
             "pending_user_updates",
             "previous_answer",

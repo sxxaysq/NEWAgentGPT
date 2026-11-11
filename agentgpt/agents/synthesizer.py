@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import asyncio
-import json
 
 from langchain_core.messages import HumanMessage, SystemMessage
 
@@ -14,6 +13,7 @@ from agentgpt.agents.base import agent_model, launch
 from agentgpt.config import Settings
 from agentgpt.host.context import role_context
 from agentgpt.model import structured_response
+from agentgpt.prefix_layout import payload_json
 
 
 def make_handler(settings: Settings):
@@ -40,7 +40,7 @@ def make_handler(settings: Settings):
                 t.FinalArtifact,
                 [
                     SystemMessage(content=prompts.SYNTHESIZER),
-                    HumanMessage(content=json.dumps(payload, ensure_ascii=False)),
+                    HumanMessage(content=payload_json(payload, settings.prefix_cache_layout)),
                 ],
             ),
             timeout=settings.task_wall_clock_s,

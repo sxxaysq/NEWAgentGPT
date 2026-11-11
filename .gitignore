@@ -1,13 +1,16 @@
+# 本地配置与虚拟环境。
 .env
 .env.*
 !.env.example
 .venv/
 venv/
+# Python 缓存、构建信息与测试缓存。
 __pycache__/
 *.py[cod]
 *.egg-info/
 .pytest_cache/
 .ruff_cache/
+# 运行数据、进程状态、日志与备份。
 data/
 ui_data/
 a2a_state/
@@ -15,10 +18,15 @@ logs/
 backups/
 *.sqlite*
 *.db
+# 密钥文件与本地依赖包。
 *.pem
 *.key
 *.tar.gz
 wheels/
 sdk_source/
+# 本地评测输出。
 artifacts/
 validation_*/
+
+# 本地隔离测试目录。
+.test-*/

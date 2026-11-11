@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     model_base_url: str = "http://127.0.0.1:8000/v1"
     model_name: str = "qwen3.8-27b"
     model_api_key: str = "not-required"
+    prefix_cache_layout: bool = False
     # Zero means deployment window is unverified: use an explicitly estimated guard.
     model_context_tokens: int = Field(default=0, ge=0)
     model_tokenizer_path: str = ""
@@ -34,6 +35,10 @@ class Settings(BaseSettings):
     image_api_key: str = ""
     mcp_config: Path = ROOT / "mcp_servers.json"
     memory_enabled: bool = False
+    memory_mode: Literal["lite", "legacy"] = "lite"
+    memory_lite_limit: int = Field(default=40, ge=1, le=200)
+    memory_recent_turns: int = Field(default=6, ge=3, le=20)
+    memory_lite_timeout_s: float = Field(default=30, gt=0)
     embedding_model: str = "BAAI/bge-small-zh-v1.5"
     embedding_cache: Path = ROOT / "data/embedding_cache"
     qdrant_url: str = ""
@@ -88,6 +93,8 @@ class Settings(BaseSettings):
     task_max_tool_calls: int = Field(default=12, ge=1, le=40)
     plan_max_revisions: int = Field(default=1, ge=0, le=3)
     task_max_retries: int = Field(default=2, ge=0, le=5)
+    recovery_max_retries: int = Field(default=3, ge=0, le=10)
+    recovery_retry_delay_s: float = Field(default=3, ge=0, le=60)
     review_excerpt_chars: int = Field(default=24000, ge=2000, le=80000)
 
     @property

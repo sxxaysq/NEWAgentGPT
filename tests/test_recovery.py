@@ -4,6 +4,7 @@ import asyncio
 import json
 import os
 import socket
+import sqlite3
 import subprocess
 import sys
 from pathlib import Path
@@ -64,6 +65,10 @@ async def test_host_sigkill_resumes_same_run_without_replaying_completed_task(tm
         checkpoint = json.loads(saved["context"])["orchestrator"]
         assert checkpoint["tasks"][0]["status"] == "completed"
         kill(first)
+        # A long Host outage must not consume the resumed execution budget.
+        saved_context = json.loads(saved["context"])
+        saved_context["orchestrator"]["deadline_at"] = 1
+        await store.update_run(run["id"], context=json.dumps(saved_context))
         second = spawn("host", tmp_path)
         (tmp_path / "release").touch()
         await wait_for(lambda: second.poll() is not None, second)
@@ -104,8 +109,9 @@ async def test_stop_intent_survives_host_sigkill(tmp_path):
 @pytest.mark.parametrize(
     "kind, expected_calls", [("committed", 1), ("uncertain-read", 2), ("uncertain-write", 1)]
 )
+@pytest.mark.parametrize("unset_status", [False, True], ids=["normal-status", "unset-status"])
 async def test_worker_sigkill_preserves_receipts_and_never_repeats_uncertain_write(
-    tmp_path, kind, expected_calls
+    tmp_path, kind, expected_calls, unset_status
 ):
     with socket.socket() as sock:
         sock.bind(("127.0.0.1", 0))
@@ -136,6 +142,17 @@ async def test_worker_sigkill_preserves_receipts_and_never_repeats_uncertain_wri
         kill(first)
         with pytest.raises(RecoveryPending):
             await pending
+        if unset_status:
+            # Reproduce a real crash between the initial Task save and the SDK's
+            # asynchronous WORKING event commit, retaining its tool journal.
+            with sqlite3.connect(tmp_path / "agent.sqlite3") as db:
+                task_id, payload = db.execute("SELECT id,payload FROM a2a_tasks").fetchone()
+                task_data = json.loads(payload)
+                task_data.pop("status", None)
+                db.execute(
+                    "UPDATE a2a_tasks SET state='TASK_STATE_UNSPECIFIED',payload=? WHERE id=?",
+                    (json.dumps(task_data), task_id),
+                )
         second = spawn("agent", tmp_path, port)
         await healthy(second)
         (tmp_path / "release").touch()

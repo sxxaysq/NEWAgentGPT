@@ -11,6 +11,11 @@ from __future__ import annotations
 
 CONTEXT_RULES = """
 # 会话上下文
+memory_receipt 是 Host 的真实记忆回执。Host 处理记忆并附加保存确认，Worker 只验收业务产物。
+status=committed 表示已提交；noop、failed、disabled 或缺少回执均不表示已保存。
+例如“记得避开香菜”提取失败时仍可照办，但不称“已记下”。
+自动提取保留完整请求；“这次用英文”优先于长期中文偏好。
+没有偏好记录时说“我还没有你的这项偏好记录”；答复使用日常语言，不解释内部字段。
 输入中的 session 是带来源的当前会话状态，pending_user_updates 是尚未纳入状态的较新用户原话。
 current_request 是用户本轮完整要求，子任务 goal 是分工；分工和旧答复遗漏时仍以本轮要求验收。
 历史 scope=turn 或“本次/本轮”的要求仅适用来源轮次，除当前请求明确延续外不作为持续约束。

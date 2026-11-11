@@ -34,6 +34,7 @@ from agentgpt.config import ModelOptions, Settings
 from agentgpt.host.context import ContextBudgetError, authorized_context_sources, role_context
 from agentgpt.mcp_manager import ToolManager
 from agentgpt.model import structured_response
+from agentgpt.prefix_layout import payload_json
 from agentgpt.store import Store
 
 log = logging.getLogger(__name__)
@@ -158,6 +159,8 @@ def make_handler(settings: Settings, manager: ToolManager, store: Store):
         scope = ctx.scope
 
         tools = manager.tools_for(scope.user_id, options.enabled_tools, options.knowledge_base)
+        if settings.prefix_cache_layout:
+            tools = sorted(tools, key=lambda tool: tool.name)
         budget = max(options.max_tool_rounds, settings.task_max_tool_calls)
         started = time.monotonic()
         total = float(settings.task_wall_clock_s)
@@ -177,7 +180,7 @@ def make_handler(settings: Settings, manager: ToolManager, store: Store):
         }
         messages: list = [
             SystemMessage(content=prompts.WORKER),
-            HumanMessage(content=json.dumps(payload, ensure_ascii=False)),
+            HumanMessage(content=payload_json(payload, settings.prefix_cache_layout)),
         ]
 
         tools_by_name = {tool.name: tool for tool in tools}

@@ -168,7 +168,8 @@ async def test_manual_conflict_and_sqlite_reopen(tmp_path):
 
 
 @pytest.mark.asyncio
-async def test_memory_management_api_and_failed_job_retry(tmp_path):
+@pytest.mark.parametrize("mode", ["lite", "legacy"])
+async def test_memory_management_api_and_failed_job_retry(tmp_path, monkeypatch, mode):
     """Drive the management routes directly: the Host no longer owns a run graph.
 
     The old version booted everything through ``test_followup.application``. Only two
@@ -178,8 +179,10 @@ async def test_memory_management_api_and_failed_job_retry(tmp_path):
     from httpx import ASGITransport, AsyncClient
 
     from agentgpt.app import app as api
+    from agentgpt.app import settings as api_settings
     from agentgpt.host.runner import NullMemory
 
+    monkeypatch.setattr(api_settings, "memory_mode", mode)
     store = Store(Settings(data_dir=tmp_path).database)
     await store.initialize()
     api.state.store = store
@@ -199,10 +202,17 @@ async def test_memory_management_api_and_failed_job_retry(tmp_path):
         assert edited.status_code == 200
         assert (await client.delete(f"/api/memories/{memory_id}?version=1")).status_code == 409
         assert (await client.delete(f"/api/memories/{memory_id}?version=2")).status_code == 200
-        assert (await client.get("/api/memories")).json()["items"] == []
+        listing = (await client.get("/api/memories")).json()
+        assert listing["items"] == [] and listing["mode"] == mode
         user = (await client.get("/api/auth/me")).json()
         await store.enqueue_memory(user["id"], "test", "retry", {"query": "使用中文"})
         pending = await store.next_memory_job()
         await store.update_memory_job(pending["id"], status="failed", attempts=3)
-        assert (await client.post("/api/memory-jobs/retry")).json() == {"retried": 1}
-        assert (await store.next_memory_job())["attempts"] == 0
+        retry = await client.post("/api/memory-jobs/retry")
+        if mode == "legacy":
+            assert retry.json() == {"retried": 1}
+            assert (await store.next_memory_job())["attempts"] == 0
+        else:
+            assert retry.status_code == 409
+            assert (await store.memory_job_status(user["id"]))["failed"] == 1
+            assert not await store.next_memory_job()

@@ -1,9 +1,7 @@
 """Durable command inbox for the Host.
 
-Keeps what was worth keeping from the LangGraph version - the SQLite-backed queue,
-one worker per conversation, an event stream the browser can replay - and drops the
-checkpoint machinery, because the unit of work is now a remote A2A task rather than
-a graph node.
+Persists commands, execution checkpoints and replayable browser events in SQLite.
+Recovery preserves the original run and remote task identities.
 """
 
 from __future__ import annotations
@@ -18,6 +16,7 @@ from agentgpt.a2a.auth import RunScope
 from agentgpt.a2a.client import A2AClient, RecoveryPending
 from agentgpt.config import ModelOptions, Settings
 from agentgpt.host.context import ContextAssembler
+from agentgpt.host.memory_receipts import sanitize_memory_claims
 from agentgpt.host.orchestrator import Orchestrator
 from agentgpt.store import Store
 
@@ -94,6 +93,18 @@ class RunManager:
                     error="missing legacy recovery checkpoint",
                 )
                 continue
+            recovery = saved.get("recovery", {})
+            if recovery.get("attempts", 0) > self.settings.recovery_max_retries:
+                await self._pause_connection(
+                    row, recovery.get("last_error", "连接恢复次数已耗尽"), row["control"] == "stop"
+                )
+                continue
+            if isinstance(saved.get("orchestrator"), dict):
+                # Process downtime is not execution time; keep the recovery counter.
+                saved["orchestrator"]["deadline_at"] = None
+                await self.store.update_run(
+                    row["id"], context=json.dumps(saved, ensure_ascii=False)
+                )
             await self.store.append_event(row["thread_id"], "recovering", {"run_id": row["id"]})
             self._ensure_worker(row["thread_id"])
 
@@ -197,9 +208,7 @@ class RunManager:
                 await self.store.update_run(row["id"], status="queued")
                 raise
             except RecoveryPending as exc:
-                await self.store.update_run(row["id"], status="queued", error=str(exc)[:1000])
-                await self.store.append_event(thread_id, "recovering", {"run_id": row["id"]})
-                await asyncio.sleep(3)
+                await self._recover_connection(row, control, exc)
             except Exception as exc:  # noqa: BLE001 - surfaced to the UI
                 log.exception("run failed")
                 await self.store.ensure_turn_for_run(row["id"])
@@ -211,6 +220,42 @@ class RunManager:
                 )
                 if self.summaries:
                     self.summaries.wake.set()
+
+    async def _recover_connection(self, row, control, exc):
+        current = await self.store.run(row["id"])
+        saved = json.loads(current["context"] or "{}")
+        recovery = saved.setdefault("recovery", {})
+        recovery["attempts"] = recovery.get("attempts", 0) + 1
+        recovery["last_error"] = str(exc)[:1000]
+        if isinstance(saved.get("orchestrator"), dict):
+            # Outage time must not turn pending work into permanently cancelled steps.
+            saved["orchestrator"]["deadline_at"] = None
+        await self.store.update_run(
+            row["id"], context=json.dumps(saved, ensure_ascii=False), error=str(exc)[:1000]
+        )
+        if control.stop or recovery["attempts"] > self.settings.recovery_max_retries:
+            await self._pause_connection(
+                row, str(exc)[:1000], control.stop and control.reason == "stop"
+            )
+            return
+        await self.store.update_run(row["id"], status="queued")
+        await self.store.append_event(
+            row["thread_id"], "recovering", {"run_id": row["id"], "attempt": recovery["attempts"]}
+        )
+        await asyncio.sleep(self.settings.recovery_retry_delay_s)
+
+    async def _pause_connection(self, row, error, stopped=False):
+        await self.store.finish_turn(
+            row["id"],
+            outcome="stopped" if stopped else "paused",
+            assistant_text=(
+                "运行已停止。"
+                if stopped
+                else "连接暂时无法恢复，执行进度已保存；网络恢复后可点击继续。"
+            ),
+            state=await self.state(row["thread_id"]),
+            error=error,
+        )
 
     async def _close_view(self, thread_id: str, goal: str, status: str, answer: str) -> None:
         """Project the terminal status into the state view the UI reads.
@@ -254,6 +299,23 @@ class RunManager:
             run_id=row["id"],
             knowledge_base=options.knowledge_base,
         )
+        receipt = None
+        if getattr(self.store, "memory_lite", False):
+            receipt = await self.memory.handle(
+                scope.user_id, thread_id, turn["input_seq"], options.memory_scope
+            )
+            if receipt:
+                await self.store.append_event(thread_id, "memory_receipt", receipt)
+                if (
+                    receipt.get("intent") == "explicit"
+                    and receipt["status"] == "committed"
+                    and not receipt["remaining"]
+                ):
+                    await self.store.finish_turn(
+                        row["id"], outcome="completed", assistant_text=receipt["message"]
+                    )
+                    return
+                goal = receipt.get("remaining") or goal
         preference = await self.store.memory_preference(scope.user_id)
         revision = preference["revision"]
         background = saved.get("background")
@@ -263,12 +325,12 @@ class RunManager:
             and background.get("memory_context")
         ):
             raise ValueError("长期记忆服务设置已变更，旧运行已停止；请重新发起请求。")
-        if saved.get("memory_revision", revision) != revision and saved.get("orchestrator"):
-            # A checkpoint can contain derived old-memory text in plans and remote requests.
-            # Replaying it would bypass deletion; restarting could repeat tool side effects.
-            raise ValueError("记忆设置或内容已变更，本次恢复已停止；请重新发起请求。")
-        if not isinstance(background, dict) or saved.get("memory_revision") != revision:
+        # Keep the exact prompt and dispatch inputs for an existing run. Unrelated
+        # new memories apply to future runs; revoked injected memories are checked below.
+        if not isinstance(background, dict):
             background = await self._background(thread, scope, row, turn, options)
+        if receipt:
+            background["memory_receipt"] = receipt
         saved.update(
             {
                 "version": 1,
@@ -303,6 +365,13 @@ class RunManager:
             context_guard=context_guard,
         )
         answer = await orchestrator.run(scope, goal, options, background)
+        answer = sanitize_memory_claims(answer, receipt)
+        if (
+            receipt
+            and receipt.get("message")
+            and not (receipt["status"] == "disabled" and receipt.get("intent") == "none")
+        ):
+            answer += "\n\n" + receipt["message"]
 
         status = getattr(orchestrator, "completion_status", "completed")
         if control.stop:
@@ -338,6 +407,8 @@ class RunManager:
         try:
             memories = await self.memory.recall(scope.user_id, options.memory_scope, query)
         except Exception:
+            if getattr(self.store, "memory_lite", False):
+                raise
             log.warning("memory recall failed", exc_info=True)
         if not preference["enabled"] or not self.settings.memory_enabled:
             memories = []
@@ -353,20 +424,23 @@ class RunManager:
 
     async def _validate_memory_snapshot(self, scope, memory_scope, background):
         manifest = background.get("manifest", {})
-        expected_revision = manifest.get("memory_revision", 0)
+        if manifest and (
+            manifest.get("user_id", scope.user_id) != scope.user_id
+            or manifest.get("thread_id", scope.thread_id) != scope.thread_id
+        ):
+            raise ValueError("记忆上下文不属于当前用户或会话。")
         memories = background.get("memory_context") or []
+        if not isinstance(memories, list):
+            raise ValueError("旧版记忆快照缺少可校验的来源，无法恢复。")
         async with self.store.connect() as db:
             await db.execute("BEGIN")
             pref = await (
                 await db.execute(
-                    "SELECT enabled,revision FROM memory_preferences WHERE user_id=?",
+                    "SELECT enabled FROM memory_preferences WHERE user_id=?",
                     (scope.user_id,),
                 )
             ).fetchone()
-            revision = pref["revision"] if pref else 0
             enabled = bool(pref["enabled"]) if pref else True
-            if revision != expected_revision:
-                raise ValueError("记忆已变更，本轮已停止；请重新发起请求。")
             if memories and (not enabled or not self.settings.memory_enabled):
                 raise ValueError("长期记忆已关闭，本轮已停止；请重新发起请求。")
             for item in memories:

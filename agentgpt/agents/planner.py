@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import asyncio
-import json
 
 from langchain_core.messages import HumanMessage, SystemMessage
 
@@ -14,6 +13,7 @@ from agentgpt.agents.base import agent_model, launch
 from agentgpt.config import Settings
 from agentgpt.host.context import role_context
 from agentgpt.model import structured_response
+from agentgpt.prefix_layout import payload_json
 
 
 def make_handler(settings: Settings):
@@ -40,7 +40,7 @@ def make_handler(settings: Settings):
         }
         if previous:
             payload.update(previous_plan=previous, feedback=feedback or "（无具体意见）")
-        human = json.dumps(payload, ensure_ascii=False)
+        human = payload_json(payload, settings.prefix_cache_layout)
         messages = [SystemMessage(content=prompts.PLANNER), HumanMessage(content=human)]
 
         plan = await asyncio.wait_for(
